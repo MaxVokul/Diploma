@@ -15,6 +15,7 @@ const closeModalWindow = function(){
     modalWindow.classList.add('hidden')
 }
 
+
 btnsclose.addEventListener('click',closeModalWindow);
 
 const closeModalWindow1 = function(e) {
