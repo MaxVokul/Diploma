@@ -124,11 +124,11 @@ header{
     width: 80%;
 }
 .foryouin{
-    width: 80%;
-    height: 60vh;
-    display: flex;
-    align-items: center;
-    justify-items: center;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    grid-column-gap: 20px;
+    grid-row-gap: 20px;
     margin: 3dvh 0 0 0;
 }
 .foryouh2{
@@ -144,7 +144,7 @@ header{
     margin: 1.2dvh 0;
 }
 .bigrect{
-    width: 40%;
+    grid-area: 1 / 1 / 3 / 2;
     height: 100%;
     background-color: var(--secondary2);
     border-radius: 20px;
@@ -152,7 +152,6 @@ header{
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    margin: 0 4dvw 0 0;
     box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.527);
 }
 #bigrect{
@@ -171,6 +170,7 @@ header{
     margin: 4dvh;
 }
 .smrect2{
+    grid-area: 1 / 2 / 2 / 3;
     width: 60%;
     height: 100%;
     display: flex;
@@ -178,15 +178,14 @@ header{
     justify-content: center;
 }
 .smrect{
+
     display: flex;
     align-items: center;
     background-color: var(--secondary2);
     border-radius: 20px;
     box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.527);
 }
-#smrect2{
-    margin: 5dvh 0 0 0;
-}
+
 .smrect img{
     margin: 2dvh;
     width: 25%;
