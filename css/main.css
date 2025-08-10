@@ -113,6 +113,13 @@ header{
     border-width: 2px;
     border-color: var(--secondary1);
 }
+
+/*foryou section*/
+.foryouall{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
 .foryou{
     width: 80%;
 }
