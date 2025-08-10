@@ -130,6 +130,7 @@ header{
     grid-column-gap: 20px;
     grid-row-gap: 20px;
     margin: 3dvh 0 0 0;
+    width: 83%;
 }
 .foryouh2{
     padding: 1dvh;
@@ -154,8 +155,16 @@ header{
     align-items: center;
     box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.527);
 }
-#bigrect{
-    margin: 0 0 0 4dvw;
+.bigrect2{
+    grid-area: 3 / 2 / 5 / 3;
+    height: 100%;
+    background-color: var(--secondary2);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.527);
 }
 .bigrecttxt{
     width: 80%;
@@ -185,27 +194,30 @@ header{
     border-radius: 20px;
     box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.527);
 }
-
-.smrect img{
-    margin: 2dvh;
-    width: 25%;
-    height: fit-content;
+.smrect3{
+    grid-area: 3 / 1 / 4 / 2;
+    display: flex;
+    align-items: center;
+    background-color: var(--secondary2);
+    border-radius: 20px;
+    box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.527);
 }
-.smrect2 img{
+.smrect4{
+    grid-area: 4 / 1 / 5 / 2;
+    display: flex;
+    align-items: center;
+    background-color: var(--secondary2);
+    border-radius: 20px;
+    box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.527);
+}
+
+.smrectimg{
     margin: 2dvh;
     width: 25%;
     height: fit-content;
 }
 .smrecttxt{
     margin: 2dvh 0;
-}
-.foryouin2{
-    width: 80%;
-    height: 60vh;
-    display: flex;
-    align-items: center;
-    justify-items: center;
-    margin: 3dvh 0 0 0;
 }
 .back{
     display: flex;
