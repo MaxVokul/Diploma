@@ -48,6 +48,10 @@ header{
     height: auto;
     box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.527);
 }
+.header.sticky {
+    position: fixed;
+    background-color: rgba(255, 255, 255, 0.95);
+}
 #menu{
     display: none
 }
@@ -84,7 +88,7 @@ header{
     height: auto;
     background-color: var(--secondary2);
     border-radius: 25px;
-    margin: 3dvh 0;
+    margin: 10dvh 0;
     box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.527);
 }
 .tssqr{
