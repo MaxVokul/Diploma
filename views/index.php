@@ -1,11 +1,11 @@
 <?php
 include 'header.php';
-require_once $_SERVER['DOCUMENT_ROOT']."/models/Room.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/models/Room.php";
 $rooms = Room::getAllrooms();
 ?>
 <section class="tssection">
     <h2 class="mains">Top stories</h2>
-    <a href="topstory.html">
+    <a href="News/topstory.html">
         <div class="tssqr">
             <img class="imgts" src="../resources/image%201.png" alt="">
             <div class="tstext">

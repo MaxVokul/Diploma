@@ -1,5 +1,5 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT']."/config.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/config.php";
 //
 class Room {
     public static function getAllrooms() {

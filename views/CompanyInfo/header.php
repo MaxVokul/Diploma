@@ -42,7 +42,7 @@
         </a>
             <ol class="ol2">
                 <li>
-                    <a href="index.php">Home</a>
+                    <a href="../index.php">Home</a>
                 </li>
                 <li>
                     <a href="#">For you</a>
@@ -61,7 +61,7 @@
     </ol>
     <div class="nav">
         <ul>
-            <a href="index.php">
+            <a href="../index.php">
                 <li><h3>Home
             </a></h3></li>
             </a>
