@@ -6,27 +6,39 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalWindow = document.querySelector('.modal-window');
     const overlay = document.querySelector('.overlay');
     const closeModalBtn = document.querySelector('.btn--close-modal-window');
-    const showModalBtns = document.querySelectorAll('.btn--show-modal-window');
+
+    // 🔴 УБРАЛИ: const showModalBtns = ... и весь связанный код!
 
     // Функция переключения форм
     function switchForm(tabName) {
-        // Убираем активный класс со всех кнопок
         toggleButtons.forEach(btn => btn.classList.remove('active'));
-
-        // Скрываем обе формы
         if (loginForm) loginForm.style.display = 'none';
         if (registerForm) registerForm.style.display = 'none';
 
-        // Показываем нужную форму и делаем кнопку активной
         if (tabName === 'login') {
             const loginBtn = document.querySelector('[data-tab="login"]');
             if (loginBtn) loginBtn.classList.add('active');
-            if (loginForm) loginForm.style.display = 'flex'; // Используем flex для совместимости
+            if (loginForm) loginForm.style.display = 'flex';
         } else if (tabName === 'register') {
             const registerBtn = document.querySelector('[data-tab="register"]');
             if (registerBtn) registerBtn.classList.add('active');
-            if (registerForm) registerForm.style.display = 'flex'; // Используем flex
+            if (registerForm) registerForm.style.display = 'flex';
         }
+    }
+
+    // 🔴 ОБНОВЛЕННАЯ ФУНКЦИЯ openModal — теперь она используется ТОЛЬКО через profileLink
+    function openModal() {
+        if (modalWindow) modalWindow.classList.remove('hidden');
+        if (overlay) overlay.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        switchForm('login');
+    }
+
+    // Закрытие модального окна
+    function closeModal() {
+        if (modalWindow) modalWindow.classList.add('hidden');
+        if (overlay) overlay.classList.add('hidden');
+        document.body.style.overflow = '';
     }
 
     // Обработчик клика по табам
@@ -39,25 +51,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Открытие модального окна
-    function openModal() {
-        if (modalWindow) modalWindow.classList.remove('hidden');
-        if (overlay) overlay.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-        switchForm('login'); // По умолчанию показываем логин
-    }
+    // 🔴 НАЗНАЧАЕМ СОБЫТИЕ ТОЛЬКО НА ИКОНКУ ПРОФИЛЯ
+    const profileLink = document.querySelector('.btn--show-modal-window.profile-link');
+    // 🔴 Новый индикатор: есть ли пользователь в системе?
+    const isAuthenticated = document.getElementById('user-authenticated') !== null;
 
-    // Закрытие модального окна
-    function closeModal() {
-        if (modalWindow) modalWindow.classList.add('hidden');
-        if (overlay) overlay.classList.add('hidden');
-        document.body.style.overflow = '';
-    }
-
-    // Назначаем события на кнопки открытия
-    if (showModalBtns) {
-        showModalBtns.forEach(btn => {
-            btn.addEventListener('click', openModal);
+    if (profileLink) {
+        profileLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Проверяем: залогинен ли пользователь?
+            if (isAuthenticated) {
+                // Если да — переходим на профиль
+                window.location.href = '/profile.php';
+            } else {
+                // Если нет — открываем модалку
+                openModal();
+            }
         });
     }
 
@@ -86,20 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Profile Page Functionality
 function initProfilePage() {
-    // Обработчик для кнопки выхода
-    const logoutBtn = document.querySelector('.btn-logout');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (confirm('Are you sure you want to logout?')) {
-                // В реальном приложении здесь был бы AJAX-запрос на сервер
-                alert('You have been logged out');
-                window.location.href = '/index.php';
-            }
-        });
-    }
-
-    // Обработчик для кнопки удаления аккаунта
+// Обработчик для кнопки удаления аккаунта
     const deleteBtn = document.querySelector('.btn-delete');
     if (deleteBtn) {
         deleteBtn.addEventListener('click', function(e) {
@@ -110,7 +106,6 @@ function initProfilePage() {
             }
         });
     }
-
     // Обработчики для кнопок настроек
     const settingButtons = document.querySelectorAll('.btn-secondary');
     settingButtons.forEach(button => {
@@ -124,7 +119,6 @@ function initProfilePage() {
 
 // Инициализация функционала профиля при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
-    // Проверяем, что мы на странице профиля
     if (document.querySelector('.profile-container')) {
         initProfilePage();
     }

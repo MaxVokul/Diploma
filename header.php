@@ -118,26 +118,22 @@ require_once 'app/core/Database.php';
             <path d="M12.75 0C9.24375 0 6.12 1.46625 3.76125 3.76125C1.46625 6.05625 0 9.18 0 12.75C0 16.2563 1.46625 19.38 3.76125 21.7388L25.5 43.4775L47.2388 21.7388C49.5337 19.4438 51 16.32 51 12.75C51 9.24375 49.5337 6.12 47.2388 3.76125C44.9437 1.46625 41.82 0 38.25 0C34.7438 0 31.62 1.46625 29.2613 3.76125C26.9663 6.05625 25.5 9.18 25.5 12.75C25.5 9.24375 24.0338 6.12 21.7388 3.76125C19.4438 1.46625 16.32 0 12.75 0Z"
                   fill="black"/>
         </svg>
-        <?php if (isset($_SESSION['user_id'])): ?>
-            <a href="/profile.php">
-                <svg class="rpl" width="52" height="46" viewBox="0 0 52 46" fill="none"
-                     xmlns="http://www.w3.org/2000/svg">
-                    <path d="M19.307 0V6.43568H45.0497V38.6141H19.307V45.0497H51.4854V0H19.307ZM25.7427 12.8714V19.307H0V25.7427H25.7427V32.1784L38.6141 22.5249L25.7427 12.8714Z"
-                          fill="black"/>
-                </svg>
-            </a>
-            <a href="/logout.php" class="logout-link">Logout</a>
-        <?php else: ?>
-            <a href="#" class="btn--show-modal-window">
-                <svg class="rpl" width="52" height="46" viewBox="0 0 52 46" fill="none"
-                     xmlns="http://www.w3.org/2000/svg">
-                    <path d="M19.307 0V6.43568H45.0497V38.6141H19.307V45.0497H51.4854V0H19.307ZM25.7427 12.8714V19.307H0V25.7427H25.7427V32.1784L38.6141 22.5249L25.7427 12.8714Z"
-                          fill="black"/>
-                </svg>
-            </a>
-        <?php endif; ?>
+
+        <!-- Иконка профиля: всегда одна и та же кнопка -->
+        <a href="#" class="btn--show-modal-window profile-link">
+            <svg class="rpl" width="52" height="46" viewBox="0 0 52 46" fill="none"
+                 xmlns="http://www.w3.org/2000/svg">
+                <path d="M19.307 0V6.43568H45.0497V38.6141H19.307V45.0497H51.4854V0H19.307ZM25.7427 12.8714V19.307H0V25.7427H25.7427V32.1784L38.6141 22.5249L25.7427 12.8714Z"
+                      fill="black"/>
+            </svg>
+        </a>
+
     </div>
 </header>
+
+<?php if (isset($_SESSION['user_id'])): ?>
+    <div id="user-authenticated" style="display: none;"></div>
+<?php endif; ?>
 
 <!-- Modal window -->
 <div class="modal-window hidden">

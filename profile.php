@@ -1,5 +1,10 @@
 <?php
+session_start();
+
 require_once 'header.php';
+require_once 'app/core/Database.php';
+require_once 'app/models/UserModel.php';
+require_once 'app/models/NewsModel.php';
 
 // Проверяем, что пользователь авторизован
 if (!isset($_SESSION['user_id'])) {
