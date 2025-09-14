@@ -1,28 +1,28 @@
 <?php
 session_start();
 
-// Проверяем, что пользователь авторизован
+require_once __DIR__ . '/app/core/Database.php';      // Для Singleton
+require_once __DIR__ . '/app/models/UserModel.php';   // КЛЮЧЕВОЙ ШАГ!
+
+// Проверяем авторизацию
 if (!isset($_SESSION['user_id'])) {
     header('Location: /login.php');
     exit();
 }
 
-// Обработка обновления предпочтений
-if ($_POST && isset($_POST['categories'])) {
-    $selectedCategories = $_POST['categories'];
+// Получаем данные из POST
+$categories = $_POST['categories'] ?? [];
 
-    $userModel = new UserModel();
-    $preferences = [
-        'categories' => $selectedCategories
-    ];
+// Создаём экземпляр модели
+$userModel = new UserModel();
 
-    if ($userModel->updatePreferences($_SESSION['user_id'], $preferences)) {
-        $_SESSION['preferences'] = $preferences;
-        header('Location: /profile.php?success=preferences_updated');
-        exit();
-    }
+// Обновляем предпочтения пользователя
+$result = $userModel->updatePreferences($_SESSION['user_id'], ['categories' => $categories]);
+
+if ($result) {
+    $_SESSION['preferences'] = ['categories' => $categories]; // Обновляем сессию
+    echo json_encode(['success' => true, 'message' => 'Preferences updated!']);
+} else {
+    echo json_encode(['success' => false, 'message' => 'Failed to update preferences.']);
 }
-
-header('Location: /profile.php');
-exit();
 ?>
