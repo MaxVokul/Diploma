@@ -1,7 +1,5 @@
 <?php
 
-use models\UserModel;
-
 class Controller {
     protected $view;
 
@@ -12,6 +10,7 @@ class Controller {
     // Проверка авторизации
     protected function checkAuth() {
         if (!isset($_SESSION['user_id'])) {
+            $_SESSION['redirect_to'] = $_SERVER['REQUEST_URI'];
             header('Location: /login.php');
             exit();
         }
@@ -29,6 +28,13 @@ class Controller {
     // Редирект
     protected function redirect($url) {
         header("Location: $url");
+        exit();
+    }
+
+    // JSON ответ
+    protected function json($data) {
+        header('Content-Type: application/json');
+        echo json_encode($data);
         exit();
     }
 }

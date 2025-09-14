@@ -9,7 +9,9 @@ class Database {
     private $password;
 
     private function __construct() {
-        require_once '../config/database.php';
+
+        // Подключаем конфиг
+        require_once __DIR__ . '/../../config/database.php';
 
         $this->host = DB_HOST;
         $this->dbname = DB_NAME;
@@ -51,5 +53,23 @@ class Database {
     // Получить PDO соединение
     public function getConnection() {
         return $this->pdo;
+    }
+
+    // Выполнить запрос SELECT
+    public function query($sql, $params = []) {
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
+    }
+
+    // Выполнить запрос INSERT/UPDATE/DELETE
+    public function execute($sql, $params = []) {
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute($params);
+    }
+
+    // Получить последний ID после INSERT
+    public function lastInsertId() {
+        return $this->pdo->lastInsertId();
     }
 }

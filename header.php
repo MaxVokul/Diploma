@@ -5,6 +5,23 @@ session_start();
 require_once 'app/core/Database.php';
 
 ?>
+<?php if (isset($_SESSION['registration_errors']) && !empty($_SESSION['registration_errors'])): ?>
+    <div style="position: fixed; top: 0; left: 0; right: 0; background: #f8d7da; color: #721c24; padding: 1rem; text-align: center; z-index: 9999;">
+        <?php foreach ($_SESSION['registration_errors'] as $error): ?>
+            <p style="margin: 0.3rem 0;"><?php echo htmlspecialchars($error); ?></p>
+        <?php endforeach; ?>
+    </div>
+    <?php unset($_SESSION['registration_errors']); ?>
+<?php endif; ?>
+
+<?php if (isset($_SESSION['login_errors']) && !empty($_SESSION['login_errors'])): ?>
+    <div style="position: fixed; top: 0; left: 0; right: 0; background: #f8d7da; color: #721c24; padding: 1rem; text-align: center; z-index: 9999;">
+        <?php foreach ($_SESSION['login_errors'] as $error): ?>
+            <p style="margin: 0.3rem 0;"><?php echo htmlspecialchars($error); ?></p>
+        <?php endforeach; ?>
+    </div>
+    <?php unset($_SESSION['login_errors']); ?>
+<?php endif; ?>
 
 <!DOCTYPE html>
 <html lang="ru">
@@ -131,7 +148,7 @@ require_once 'app/core/Database.php';
         <button class="toggle-btn" data-tab="register">Register</button>
     </div>
     <!-- Login Form -->
-    <form class="modal__form login-form" style="display: flex;">
+    <form class="modal__form login-form" style="display: flex;"action="/login-process.php" method="POST">
         <label for="login-email">Email</label>
         <input type="email" id="login-email" name="email" placeholder="Enter your email" required>
         <label for="login-password">Password</label>
@@ -139,7 +156,7 @@ require_once 'app/core/Database.php';
         <button type="submit" class="btn">Login →</button>
     </form>
     <!-- Register Form -->
-    <form class="modal__form register-form" style="display: none;">
+    <form class="modal__form register-form" style="display: none;" action="/register-process.php" method="POST">
         <label for="register-name">Full Name</label>
         <input type="text" id="register-name" name="name" placeholder="Enter your full name" required>
         <label for="register-email">Email</label>
@@ -161,13 +178,13 @@ require_once 'app/core/Database.php';
         <button class="btn--close-slide-menu">×</button>
         <nav class="slide-nav">
             <ul>
-                <li><a href="/category.php">Political</a></li>
-                <li><a href="#">Nature</a></li>
-                <li><a href="#">Society</a></li>
-                <li><a href="#">World</a></li>
-                <li><a href="#">Technology</a></li>
-                <li><a href="#">Culture</a></li>
-                <li><a href="#">Sports</a></li>
+                <li><a href="/category.php?category=political">Political</a></li>
+                <li><a href="/category.php?category=nature">Nature</a></li>
+                <li><a href="/category.php?category=society">Society</a></li>
+                <li><a href="/category.php?category=world">World</a></li>
+                <li><a href="/category.php?category=technology">Technology</a></li>
+                <li><a href="/category.php?category=culture">Culture</a></li>
+                <li><a href="/category.php?category=sports">Sports</a></li>
             </ul>
         </nav>
     </div>

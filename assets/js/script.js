@@ -8,12 +8,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeModalBtn = document.querySelector('.btn--close-modal-window');
     const showModalBtns = document.querySelectorAll('.btn--show-modal-window');
 
-    // Элементы для Forgot Password
-    const forgotPasswordLinks = document.querySelectorAll('.btn--show-forgot-password');
-    const forgotPasswordModal = document.querySelector('.forgot-password-modal');
-    const backToLoginLinks = document.querySelectorAll('.btn--back-to-login');
-    const forgotPasswordForm = document.querySelector('.forgot-password-form');
-
     // Функция переключения форм
     function switchForm(tabName) {
         // Убираем активный класс со всех кнопок
@@ -79,26 +73,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Закрытие по ESC
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            if (modalWindow && !modalWindow.classList.contains('hidden')) {
-                closeModal();
-            }
-            if (forgotPasswordModal && !forgotPasswordModal.classList.contains('hidden')) {
-                closeForgotPasswordModal();
-            }
+        if (e.key === 'Escape' && !modalWindow.classList.contains('hidden')) {
+            closeModal();
         }
     });
 
-    // Предотвращаем отправку форм (для демо)
-    document.querySelectorAll('.modal__form').forEach(form => {
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                alert('Форма отправлена! В реальном проекте здесь была бы отправка на сервер.');
-                closeModal();
-            });
-        }
-    });
+
 
     // Инициализация: при загрузке страницы — показать логин
     switchForm('login');

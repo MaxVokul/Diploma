@@ -2,31 +2,28 @@
 require_once 'header.php';
 
 // Проверяем, что пользователь авторизован
-$isAuthenticated = true; // В реальном приложении: isset($_SESSION['user_id'])
-
-if (!$isAuthenticated) {
+if (!isset($_SESSION['user_id'])) {
     header('Location: /login.php');
     exit();
 }
 
-// Тестовые данные пользователя (в реальном приложении берутся из базы данных)
-$userData = [
-    'id' => 1,
-    'username' => 'JohnDoe',
-    'email' => 'john.doe@example.com',
-    'phone' => '+1 (555) 123-4567',
-    'joined_date' => 'January 2023',
-    'last_login' => 'Today at 10:30 AM',
-    'preferences' => [
-        'categories' => ['Politics', 'Technology', 'World'],
-        'notifications' => ['email', 'daily_digest']
-    ],
-    'stats' => [
-        'articles_read' => 47,
-        'comments_posted' => 12,
-        'following' => 8
-    ]
+// Получаем данные пользователя
+$userModel = new UserModel();
+$userData = $userModel->findById($_SESSION['user_id']);
+
+// Получаем предпочтения пользователя
+$preferences = $userModel->getPreferences($_SESSION['user_id']);
+
+// Получаем статистику пользователя (в реальном приложении это было бы отдельной таблицей)
+$stats = [
+    'articles_read' => 47,
+    'comments_posted' => 12,
+    'following' => 8
 ];
+
+// Получаем категории для выбора
+$newsModel = new NewsModel();
+$categories = $newsModel->getAllCategories();
 ?>
 
     <!-- Profile Content -->
@@ -44,21 +41,21 @@ $userData = [
             <div class="profile-info">
                 <h1 class="profile-username"><?php echo htmlspecialchars($userData['username']); ?></h1>
                 <p class="profile-email"><?php echo htmlspecialchars($userData['email']); ?></p>
-                <p class="profile-joined">Member since <?php echo htmlspecialchars($userData['joined_date']); ?></p>
+                <p class="profile-joined">Member since <?php echo date('F Y', strtotime($userData['created_at'])); ?></p>
             </div>
         </div>
 
         <div class="profile-stats">
             <div class="stat-item">
-                <div class="stat-number"><?php echo $userData['stats']['articles_read']; ?></div>
+                <div class="stat-number"><?php echo $stats['articles_read']; ?></div>
                 <div class="stat-label">Articles Read</div>
             </div>
             <div class="stat-item">
-                <div class="stat-number"><?php echo $userData['stats']['comments_posted']; ?></div>
+                <div class="stat-number"><?php echo $stats['comments_posted']; ?></div>
                 <div class="stat-label">Comments</div>
             </div>
             <div class="stat-item">
-                <div class="stat-number"><?php echo $userData['stats']['following']; ?></div>
+                <div class="stat-number"><?php echo $stats['following']; ?></div>
                 <div class="stat-label">Following</div>
             </div>
         </div>
@@ -69,22 +66,22 @@ $userData = [
                 <div class="setting-item">
                     <h3>Change Password</h3>
                     <p>Update your account password</p>
-                    <a href="#" class="btn btn-secondary">Change Password</a>
+                    <a href="#" class="btn btn-secondary" onclick="alert('Change password feature will be implemented soon!')">Change Password</a>
                 </div>
                 <div class="setting-item">
                     <h3>Update Profile</h3>
                     <p>Edit your personal information</p>
-                    <a href="#" class="btn btn-secondary">Edit Profile</a>
+                    <a href="#" class="btn btn-secondary" onclick="alert('Edit profile feature will be implemented soon!')">Edit Profile</a>
                 </div>
                 <div class="setting-item">
                     <h3>Notification Settings</h3>
                     <p>Manage your notification preferences</p>
-                    <a href="#" class="btn btn-secondary">Notifications</a>
+                    <a href="#" class="btn btn-secondary" onclick="alert('Notification settings feature will be implemented soon!')">Notifications</a>
                 </div>
                 <div class="setting-item">
                     <h3>Privacy Settings</h3>
                     <p>Control your privacy options</p>
-                    <a href="#" class="btn btn-secondary">Privacy</a>
+                    <a href="#" class="btn btn-secondary" onclick="alert('Privacy settings feature will be implemented soon!')">Privacy</a>
                 </div>
             </div>
         </div>
@@ -94,19 +91,30 @@ $userData = [
             <div class="interests-container">
                 <p class="interests-description">Based on your reading history and preferences</p>
                 <div class="interests-list">
-                    <?php foreach($userData['preferences']['categories'] as $category): ?>
+                    <?php foreach($preferences['categories'] as $categoryName): ?>
                         <div class="interest-tag">
-                            <?php echo htmlspecialchars($category); ?>
+                            <?php echo htmlspecialchars($categoryName); ?>
                         </div>
                     <?php endforeach; ?>
                 </div>
-                <a href="#" class="btn btn-primary">Update Interests</a>
+                <form id="preferences-form" method="POST" action="/update-preferences.php">
+                    <div class="category-preferences">
+                        <?php foreach($categories as $category): ?>
+                            <label class="preference-item">
+                                <input type="checkbox" name="categories[]" value="<?php echo htmlspecialchars($category['slug']); ?>"
+                                    <?php echo in_array($category['slug'], $preferences['categories']) ? 'checked' : ''; ?>>
+                                <span><?php echo htmlspecialchars($category['name']); ?></span>
+                            </label>
+                        <?php endforeach; ?>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Interests</button>
+                </form>
             </div>
         </div>
 
         <div class="profile-actions">
             <a href="/logout.php" class="btn btn-logout">Logout</a>
-            <a href="#" class="btn btn-delete">Delete Account</a>
+            <a href="#" class="btn btn-delete" onclick="alert('Delete account feature will be implemented soon!')">Delete Account</a>
         </div>
     </div>
 

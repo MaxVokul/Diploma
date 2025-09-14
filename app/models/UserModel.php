@@ -1,20 +1,14 @@
 <?php
 
-namespace models;
-use Database;
-
-class UserModel
-{
+class UserModel {
     protected $db;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->db = Database::getInstance();
     }
 
     // Авторизация пользователя
-    public function login($email, $password)
-    {
+    public function login($email, $password) {
         $sql = "SELECT * FROM users WHERE email = :email";
         $result = $this->db->query($sql, ['email' => $email]);
 
@@ -30,8 +24,7 @@ class UserModel
     }
 
     // Регистрация нового пользователя
-    public function register($data)
-    {
+    public function register($data) {
         // Проверка уникальности email
         $existing = $this->findByEmail($data['email']);
         if ($existing) {
@@ -44,30 +37,32 @@ class UserModel
         $data['created_at'] = date('Y-m-d H:i:s');
         $data['last_login'] = date('Y-m-d H:i:s');
 
+        // Установка значений по умолчанию
+        if (!isset($data['preferences'])) {
+            $data['preferences'] = json_encode(['categories' => []]);
+        }
+
         return $this->create($data);
     }
 
     // Поиск пользователя по email
-    public function findByEmail($email)
-    {
+    public function findByEmail($email) {
         $sql = "SELECT * FROM users WHERE email = :email";
         $result = $this->db->query($sql, ['email' => $email]);
         return !empty($result) ? $result[0] : null;
     }
 
     // Получить пользователя по ID
-    public function findById($id)
-    {
+    public function findById($id) {
         $sql = "SELECT * FROM users WHERE id = :id";
         $result = $this->db->query($sql, ['id' => $id]);
         return !empty($result) ? $result[0] : null;
     }
 
     // Создать нового пользователя
-    public function create($data)
-    {
+    public function create($data) {
         $fields = array_keys($data);
-        $placeholders = array_map(function ($field) {
+        $placeholders = array_map(function($field) {
             return ":$field";
         }, $fields);
 
@@ -81,8 +76,7 @@ class UserModel
     }
 
     // Обновить пользователя
-    public function update($id, $data)
-    {
+    public function update($id, $data) {
         $fields = [];
         foreach ($data as $key => $value) {
             $fields[] = "$key = :$key";
@@ -92,5 +86,20 @@ class UserModel
         $data['id'] = $id;
 
         return $this->db->execute($sql, $data);
+    }
+
+    // Обновление предпочтений пользователя
+    public function updatePreferences($userId, $preferences) {
+        $preferencesJson = json_encode($preferences);
+        return $this->update($userId, ['preferences' => $preferencesJson]);
+    }
+
+    // Получение предпочтений пользователя
+    public function getPreferences($userId) {
+        $user = $this->findById($userId);
+        if ($user && !empty($user['preferences'])) {
+            return json_decode($user['preferences'], true);
+        }
+        return ['categories' => []];
     }
 }
