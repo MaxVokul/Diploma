@@ -1,157 +1,3 @@
-script.js:
-document.addEventListener('DOMContentLoaded', function() {
-    // Получаем все необходимые элементы
-    const toggleButtons = document.querySelectorAll('.toggle-btn');
-    const loginForm = document.querySelector('.login-form');
-    const registerForm = document.querySelector('.register-form');
-    const modalWindow = document.querySelector('.modal-window');
-    const overlay = document.querySelector('.overlay');
-    const closeModalBtn = document.querySelector('.btn--close-modal-window');
-    const showModalBtns = document.querySelectorAll('.btn--show-modal-window');
-    const profileLink = document.querySelector('.btn--show-modal-window.profile-link');
-
-    // 🔴 Новый индикатор: есть ли пользователь в системе?
-    const isAuthenticated = document.getElementById('user-authenticated') !== null;
-
-    // Функция переключения форм
-    function switchForm(tabName) {
-        toggleButtons.forEach(btn => btn.classList.remove('active'));
-        if (loginForm) loginForm.style.display = 'none';
-        if (registerForm) registerForm.style.display = 'none';
-
-        if (tabName === 'login') {
-            const loginBtn = document.querySelector('[data-tab="login"]');
-            if (loginBtn) loginBtn.classList.add('active');
-            if (loginForm) loginForm.style.display = 'flex';
-        } else if (tabName === 'register') {
-            const registerBtn = document.querySelector('[data-tab="register"]');
-            if (registerBtn) registerBtn.classList.add('active');
-            if (registerForm) registerForm.style.display = 'flex';
-        }
-    }
-
-    // Открытие модального окна
-    function openModal() {
-        if (modalWindow) modalWindow.classList.remove('hidden');
-        if (overlay) overlay.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-        switchForm('login');
-    }
-
-    // Закрытие модального окна
-    function closeModal() {
-        if (modalWindow) modalWindow.classList.add('hidden');
-        if (overlay) overlay.classList.add('hidden');
-        document.body.style.overflow = '';
-    }
-
-    // Обработчик клика по табам
-    if (toggleButtons) {
-        toggleButtons.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const tab = this.getAttribute('data-tab');
-                if (tab) switchForm(tab);
-            });
-        });
-    }
-
-    // 🔴 ОСНОВНОЙ ЛОГИЧЕСКИЙ КЛЮЧ: Что делать при клике на иконку профиля?
-    if (profileLink) {
-        profileLink.addEventListener('click', function(e) {
-            e.preventDefault();
-
-            // Проверяем: залогинен ли пользователь?
-            if (isAuthenticated) {
-                // Если да — переходим на профиль
-                window.location.href = '/profile.php';
-            } else {
-                // Если нет — открываем модалку
-                openModal();
-            }
-        });
-    }
-
-    // Назначаем событие на кнопку закрытия
-    if (closeModalBtn) {
-        closeModalBtn.addEventListener('click', closeModal);
-    }
-
-    // Закрытие по клику на оверлей
-    if (overlay) {
-        overlay.addEventListener('click', closeModal);
-    }
-
-    // Закрытие по ESC
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && !modalWindow.classList.contains('hidden')) {
-            closeModal();
-        }
-    });
-
-    // Предотвращаем отправку форм (для демо)
-    document.querySelectorAll('.modal__form').forEach(form => {
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                alert('Форма отправлена! В реальном проекте здесь была бы отправка на сервер.');
-                closeModal();
-            });
-        }
-    });
-
-    // Инициализация: при загрузке страницы — показать логин
-    switchForm('login');
-});
-
-// Profile Page Functionality
-function initProfilePage() {
-    // Обработчик для кнопки выхода
-    const logoutBtn = document.querySelector('.btn-logout');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (confirm('Are you sure you want to logout?')) {
-                // Удаляем индикатор авторизации — чтобы JS понял, что пользователь разлогинен
-                const authIndicator = document.getElementById('user-authenticated');
-                if (authIndicator) authIndicator.remove();
-
-                // Перенаправляем на главную
-                alert('You have been logged out');
-                window.location.href = '/index.php';
-            }
-        });
-    }
-
-    // Обработчик для кнопки удаления аккаунта
-    const deleteBtn = document.querySelector('.btn-delete');
-    if (deleteBtn) {
-        deleteBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-                alert('Account deleted successfully');
-                window.location.href = '/index.php';
-            }
-        });
-    }
-
-    // Обработчики для кнопок настроек
-    const settingButtons = document.querySelectorAll('.btn-secondary');
-    settingButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            const action = this.textContent;
-            alert(`${action} feature will be implemented soon!`);
-        });
-    });
-}
-
-// Инициализация функционала профиля при загрузке страницы
-document.addEventListener('DOMContentLoaded', function() {
-    if (document.querySelector('.profile-container')) {
-        initProfilePage();
-    }
-});
-
 footer.php:
 </main>
 
@@ -223,7 +69,7 @@ footer.php:
 </body>
 </html>
 
-header.php:
+header.php
 <?php
 session_start();
 
@@ -417,7 +263,7 @@ require_once 'app/core/Database.php';
 
 <main>
 
-index.php:
+index.php
 <?php
 // Путь к корню проекта
 define('ROOT', dirname(__FILE__));
@@ -619,7 +465,7 @@ if ($user) {
     exit();
 }
 
-logout.php:
+logout.php
 <?php
 // logout.php
 
@@ -773,108 +619,109 @@ $categories = $newsModel->getAllCategories();
 
 <?php require_once 'footer.php'; ?>
 
-register.php:<?php
-             require_once 'header.php';
+register.php
+<?php
+require_once 'header.php';
 
-             // Проверяем, если пользователь уже авторизован
-             if (isset($_SESSION['user_id'])) {
-                 header('Location: /index.php');
-                 exit();
-             }
+// Проверяем, если пользователь уже авторизован
+if (isset($_SESSION['user_id'])) {
+    header('Location: /index.php');
+    exit();
+}
 
-             $error = '';
-             $success = '';
+$error = '';
+$success = '';
 
-             // Обработка формы регистрации
-             if ($_POST && isset($_POST['name']) && isset($_POST['email']) && isset($_POST['password']) && isset($_POST['confirm_password'])) {
-                 $name = trim($_POST['name']);
-                 $email = trim($_POST['email']);
-                 $password = $_POST['password'];
-                 $confirm_password = $_POST['confirm_password'];
-                 $phone = trim($_POST['phone'] ?? '');
+// Обработка формы регистрации
+if ($_POST && isset($_POST['name']) && isset($_POST['email']) && isset($_POST['password']) && isset($_POST['confirm_password'])) {
+    $name = trim($_POST['name']);
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
+    $confirm_password = $_POST['confirm_password'];
+    $phone = trim($_POST['phone'] ?? '');
 
-                 // Валидация
-                 if (empty($name) || empty($email) || empty($password)) {
-                     $error = 'Please fill in all required fields';
-                 } elseif ($password !== $confirm_password) {
-                     $error = 'Passwords do not match';
-                 } elseif (strlen($password) < 6) {
-                     $error = 'Password must be at least 6 characters long';
-                 } else {
-                     $userModel = new UserModel();
-                     $userData = [
-                         'username' => $name,
-                         'email' => $email,
-                         'phone' => $phone,
-                         'password' => $password
-                     ];
+    // Валидация
+    if (empty($name) || empty($email) || empty($password)) {
+        $error = 'Please fill in all required fields';
+    } elseif ($password !== $confirm_password) {
+        $error = 'Passwords do not match';
+    } elseif (strlen($password) < 6) {
+        $error = 'Password must be at least 6 characters long';
+    } else {
+        $userModel = new UserModel();
+        $userData = [
+            'username' => $name,
+            'email' => $email,
+            'phone' => $phone,
+            'password' => $password
+        ];
 
-                     $userId = $userModel->register($userData);
+        $userId = $userModel->register($userData);
 
-                     if ($userId) {
-                         $success = 'Registration successful! You can now log in.';
+        if ($userId) {
+            $success = 'Registration successful! You can now log in.';
 
-                         // Автоматически авторизуем пользователя
-                         $user = $userModel->login($email, $password);
-                         if ($user) {
-                             $_SESSION['user_id'] = $user['id'];
-                             $_SESSION['username'] = $user['username'];
-                             $_SESSION['email'] = $user['email'];
-                             header("Location: /index.php");
-                             exit();
-                         }
-                     } else {
-                         $error = 'Email already exists';
-                     }
-                 }
-             }
-             ?>
+            // Автоматически авторизуем пользователя
+            $user = $userModel->login($email, $password);
+            if ($user) {
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['email'] = $user['email'];
+                header("Location: /index.php");
+                exit();
+            }
+        } else {
+            $error = 'Email already exists';
+        }
+    }
+}
+?>
 
-                 <div class="login-container">
-                     <div class="login-form-wrapper">
-                         <h1>Create Account</h1>
-                         <p>Join our community to personalize your news experience.</p>
+    <div class="login-container">
+        <div class="login-form-wrapper">
+            <h1>Create Account</h1>
+            <p>Join our community to personalize your news experience.</p>
 
-                         <?php if ($error): ?>
-                             <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
-                         <?php endif; ?>
+            <?php if ($error): ?>
+                <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
+            <?php endif; ?>
 
-                         <?php if ($success): ?>
-                             <div class="success-message"><?php echo htmlspecialchars($success); ?></div>
-                         <?php endif; ?>
+            <?php if ($success): ?>
+                <div class="success-message"><?php echo htmlspecialchars($success); ?></div>
+            <?php endif; ?>
 
-                         <!-- Registration Form -->
-                         <form class="login-form" method="POST">
-                             <div class="form-group">
-                                 <label for="register-name">Full Name</label>
-                                 <input type="text" id="register-name" name="name" value="<?php echo htmlspecialchars($_POST['name'] ?? ''); ?>" required placeholder="Enter your full name">
-                             </div>
-                             <div class="form-group">
-                                 <label for="register-email">Email</label>
-                                 <input type="email" id="register-email" name="email" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>" required placeholder="Enter your email">
-                             </div>
-                             <div class="form-group">
-                                 <label for="register-phone">Phone Number</label>
-                                 <input type="tel" id="register-phone" name="phone" class="phone" value="<?php echo htmlspecialchars($_POST['phone'] ?? ''); ?>" placeholder="+1 (123) 456-7890">
-                             </div>
-                             <div class="form-group">
-                                 <label for="register-password">Password</label>
-                                 <input type="password" id="register-password" name="password" required placeholder="Create password">
-                             </div>
-                             <div class="form-group">
-                                 <label for="register-confirm-password">Confirm Password</label>
-                                 <input type="password" id="register-confirm-password" name="confirm_password" required placeholder="Confirm password">
-                             </div>
-                             <button type="submit" class="btn login-btn">Register</button>
-                         </form>
+            <!-- Registration Form -->
+            <form class="login-form" method="POST">
+                <div class="form-group">
+                    <label for="register-name">Full Name</label>
+                    <input type="text" id="register-name" name="name" value="<?php echo htmlspecialchars($_POST['name'] ?? ''); ?>" required placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" name="email" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>" required placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="register-phone">Phone Number</label>
+                    <input type="tel" id="register-phone" name="phone" class="phone" value="<?php echo htmlspecialchars($_POST['phone'] ?? ''); ?>" placeholder="+1 (123) 456-7890">
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password</label>
+                    <input type="password" id="register-password" name="password" required placeholder="Create password">
+                </div>
+                <div class="form-group">
+                    <label for="register-confirm-password">Confirm Password</label>
+                    <input type="password" id="register-confirm-password" name="confirm_password" required placeholder="Confirm password">
+                </div>
+                <button type="submit" class="btn login-btn">Register</button>
+            </form>
 
-                         <div class="register-link">
-                             <p>Already have an account? <a href="/login.php" class="toggle-to-login">Login here</a></p>
-                         </div>
-                     </div>
-                 </div>
+            <div class="register-link">
+                <p>Already have an account? <a href="/login.php" class="toggle-to-login">Login here</a></p>
+            </div>
+        </div>
+    </div>
 
-             <?php require_once 'footer.php'; ?>
+<?php require_once 'footer.php'; ?>
 
 register-process.php:
 <?php
@@ -947,33 +794,411 @@ update-preferences.php:
 <?php
 session_start();
 
-// Проверяем, что пользователь авторизован
+require_once __DIR__ . '/app/core/Database.php';      // Для Singleton
+require_once __DIR__ . '/app/models/UserModel.php';   // КЛЮЧЕВОЙ ШАГ!
+
+// Проверяем авторизацию
 if (!isset($_SESSION['user_id'])) {
     header('Location: /login.php');
     exit();
 }
 
-// Обработка обновления предпочтений
-if ($_POST && isset($_POST['categories'])) {
-    $selectedCategories = $_POST['categories'];
+// Получаем данные из POST
+$categories = $_POST['categories'] ?? [];
 
-    $userModel = new UserModel();
-    $preferences = [
-        'categories' => $selectedCategories
-    ];
+// Создаём экземпляр модели
+$userModel = new UserModel();
 
-    if ($userModel->updatePreferences($_SESSION['user_id'], $preferences)) {
-        $_SESSION['preferences'] = $preferences;
-        header('Location: /profile.php?success=preferences_updated');
+// Обновляем предпочтения пользователя
+$result = $userModel->updatePreferences($_SESSION['user_id'], ['categories' => $categories]);
+
+if ($result) {
+    $_SESSION['preferences'] = ['categories' => $categories]; // Обновляем сессию
+    echo json_encode(['success' => true, 'message' => 'Preferences updated!']);
+} else {
+    echo json_encode(['success' => false, 'message' => 'Failed to update preferences.']);
+}
+?>
+
+app/core
+controller.php
+<?php
+
+class Controller {
+    protected $view;
+
+    public function __construct() {
+        $this->view = new View();
+    }
+
+    // Проверка авторизации
+    protected function checkAuth() {
+        if (!isset($_SESSION['user_id'])) {
+            $_SESSION['redirect_to'] = $_SERVER['REQUEST_URI'];
+            header('Location: /login.php');
+            exit();
+        }
+    }
+
+    // Получение текущего пользователя
+    protected function getCurrentUser() {
+        if (isset($_SESSION['user_id'])) {
+            $userModel = new UserModel();
+            return $userModel->findById($_SESSION['user_id']);
+        }
+        return null;
+    }
+
+    // Редирект
+    protected function redirect($url) {
+        header("Location: $url");
+        exit();
+    }
+
+    // JSON ответ
+    protected function json($data) {
+        header('Content-Type: application/json');
+        echo json_encode($data);
         exit();
     }
 }
+database.php
+<?php
 
-header('Location: /profile.php');
-exit();
-?>
+class Database {
+    private static $instance = null;
+    private $pdo;
+    private $host;
+    private $dbname;
+    private $username;
+    private $password;
 
-css:
+    private function __construct() {
+
+        // Подключаем конфиг
+        require_once __DIR__ . '/../../config/database.php';
+
+        $this->host = DB_HOST;
+        $this->dbname = DB_NAME;
+        $this->username = DB_USER;
+        $this->password = DB_PASS;
+
+        try {
+            $this->pdo = new PDO(
+                "mysql:host={$this->host};dbname={$this->dbname};charset=utf8",
+                $this->username,
+                $this->password,
+                [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES => false,
+                ]
+            );
+        } catch (PDOException $e) {
+            throw new Exception("Connection failed: " . $e->getMessage());
+        }
+    }
+
+    // Запрещаем клонирование
+    private function __clone() {}
+
+    // Запрещаем восстановление
+    public function __wakeup() {
+        throw new Exception("Cannot unserialize singleton");
+    }
+
+    // Получить экземпляр (Singleton)
+    public static function getInstance() {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+    // Получить PDO соединение
+    public function getConnection() {
+        return $this->pdo;
+    }
+
+    // Выполнить запрос SELECT
+    public function query($sql, $params = []) {
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
+    }
+
+    // Выполнить запрос INSERT/UPDATE/DELETE
+    public function execute($sql, $params = []) {
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute($params);
+    }
+
+    // Получить последний ID после INSERT
+    public function lastInsertId() {
+        return $this->pdo->lastInsertId();
+    }
+}
+View.php
+<?php
+
+class View {
+    public function render($view, $data = []) {
+        extract($data);
+
+        // Подключаем layout
+        include '../header.php';
+        include "../app/views/{$view}.php";
+        include '../footer.php';
+    }
+
+    public function renderPartial($view, $data = []) {
+        extract($data);
+        include "../app/views/{$view}.php";
+    }
+}
+app/models
+NewsModel.php
+<?php
+
+class NewsModel {
+    protected $db;
+
+    public function __construct() {
+        $this->db = Database::getInstance();
+    }
+
+    // Получить последние новости
+    public function getLatest($limit = 10, $offset = 0) {
+        $sql = "SELECT n.*, c.name as category_name, c.slug as category_slug,
+                u.username as author_name
+                FROM news n
+                JOIN categories c ON n.category_id = c.id
+                JOIN users u ON n.author_id = u.id
+                WHERE n.is_published = 1
+                ORDER BY n.published_at DESC
+                LIMIT :limit OFFSET :offset";
+
+        $stmt = $this->db->getConnection()->prepare($sql);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
+    // Получить новости по категории
+    public function getByCategory($categoryId, $limit = 10, $offset = 0) {
+        $sql = "SELECT n.*, c.name as category_name, c.slug as category_slug,
+                u.username as author_name
+                FROM news n
+                JOIN categories c ON n.category_id = c.id
+                JOIN users u ON n.author_id = u.id
+                WHERE n.category_id = :category_id AND n.is_published = 1
+                ORDER BY n.published_at DESC
+                LIMIT :limit OFFSET :offset";
+
+        $stmt = $this->db->getConnection()->prepare($sql);
+        $stmt->bindValue(':category_id', $categoryId, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
+    // Получить новости по ключевому слову
+    public function search($keyword, $limit = 10, $offset = 0) {
+        $sql = "SELECT n.*, c.name as category_name, c.slug as category_slug,
+                u.username as author_name
+                FROM news n
+                JOIN categories c ON n.category_id = c.id
+                JOIN users u ON n.author_id = u.id
+                WHERE (n.title LIKE :keyword OR n.content LIKE :keyword)
+                AND n.is_published = 1
+                ORDER BY n.published_at DESC
+                LIMIT :limit OFFSET :offset";
+
+        $stmt = $this->db->getConnection()->prepare($sql);
+        $stmt->bindValue(':keyword', "%{$keyword}%", PDO::PARAM_STR);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
+    // Получить рекомендуемые новости для пользователя
+    public function getRecommendedForUser($userId, $limit = 10) {
+        // Получаем предпочтения пользователя
+        $userModel = new UserModel();
+        $preferences = $userModel->getPreferences($userId);
+
+        if (empty($preferences['categories'])) {
+            // Если нет предпочтений, возвращаем последние новости
+            return $this->getLatest($limit);
+        }
+
+        // Формируем запрос для рекомендаций на основе предпочтений
+        $categoryIds = implode(',', array_map('intval', $preferences['categories']));
+
+        $sql = "SELECT n.*, c.name as category_name, c.slug as category_slug,
+                u.username as author_name
+                FROM news n
+                JOIN categories c ON n.category_id = c.id
+                JOIN users u ON n.author_id = u.id
+                WHERE n.category_id IN ({$categoryIds}) AND n.is_published = 1
+                ORDER BY n.published_at DESC
+                LIMIT :limit";
+
+        $stmt = $this->db->getConnection()->prepare($sql);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $results = $stmt->fetchAll();
+
+        // Если не хватает новостей, добавляем последние
+        if (count($results) < $limit) {
+            $additional = $this->getLatest($limit - count($results));
+            $results = array_merge($results, $additional);
+        }
+
+        return $results;
+    }
+
+    // Увеличить счетчик просмотров
+    public function incrementViews($id) {
+        $sql = "UPDATE news SET views = views + 1 WHERE id = :id";
+        return $this->db->execute($sql, ['id' => $id]);
+    }
+
+    // Получить полную информацию о новости
+    public function getFullNews($id) {
+        $sql = "SELECT n.*, c.name as category_name, c.slug as category_slug,
+                u.username as author_name, u.id as author_id
+                FROM news n
+                JOIN categories c ON n.category_id = c.id
+                JOIN users u ON n.author_id = u.id
+                WHERE n.id = :id AND n.is_published = 1";
+
+        $result = $this->db->query($sql, ['id' => $id]);
+        return !empty($result) ? $result[0] : null;
+    }
+
+    // Получить все категории
+    public function getAllCategories() {
+        $sql = "SELECT * FROM categories ORDER BY name ASC";
+        return $this->db->query($sql);
+    }
+}
+UserModel.php
+<?php
+require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../app/core/Database.php';
+class UserModel {
+    protected $db;
+
+    public function __construct() {
+        $this->db = Database::getInstance();
+    }
+
+    // Авторизация пользователя
+    public function login($email, $password) {
+        $sql = "SELECT * FROM users WHERE email = :email";
+        $result = $this->db->query($sql, ['email' => $email]);
+
+        if (!empty($result)) {
+            $user = $result[0];
+            if (password_verify($password, $user['password_hash'])) {
+                // Обновляем время последнего входа
+                $this->update($user['id'], ['last_login' => date('Y-m-d H:i:s')]);
+                return $user;
+            }
+        }
+        return false;
+    }
+
+    // Регистрация нового пользователя
+    public function register($data) {
+        // Проверка уникальности email
+        $existing = $this->findByEmail($data['email']);
+        if ($existing) {
+            return false;
+        }
+
+        // Хэширование пароля
+        $data['password_hash'] = password_hash($data['password'], PASSWORD_DEFAULT);
+        unset($data['password']);
+        $data['created_at'] = date('Y-m-d H:i:s');
+        $data['last_login'] = date('Y-m-d H:i:s');
+
+        // Установка значений по умолчанию
+        if (!isset($data['preferences'])) {
+            $data['preferences'] = json_encode(['categories' => []]);
+        }
+
+        return $this->create($data);
+    }
+
+    // Поиск пользователя по email
+    public function findByEmail($email) {
+        $sql = "SELECT * FROM users WHERE email = :email";
+        $result = $this->db->query($sql, ['email' => $email]);
+        return !empty($result) ? $result[0] : null;
+    }
+
+    // Получить пользователя по ID
+    public function findById($id) {
+        $sql = "SELECT * FROM users WHERE id = :id";
+        $result = $this->db->query($sql, ['id' => $id]);
+        return !empty($result) ? $result[0] : null;
+    }
+
+    // Создать нового пользователя
+    public function create($data) {
+        $fields = array_keys($data);
+        $placeholders = array_map(function($field) {
+            return ":$field";
+        }, $fields);
+
+        $sql = "INSERT INTO users (" . implode(', ', $fields) . ")
+                VALUES (" . implode(', ', $placeholders) . ")";
+
+        if ($this->db->execute($sql, $data)) {
+            return $this->db->lastInsertId();
+        }
+        return false;
+    }
+
+    // Обновить пользователя
+    public function update($id, $data) {
+        $fields = [];
+        foreach ($data as $key => $value) {
+            $fields[] = "$key = :$key";
+        }
+
+        $sql = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = :id";
+        $data['id'] = $id;
+
+        return $this->db->execute($sql, $data);
+    }
+
+    // Обновление предпочтений пользователя
+    public function updatePreferences($userId, $preferences) {
+        $preferencesJson = json_encode($preferences);
+        return $this->update($userId, ['preferences' => $preferencesJson]);
+    }
+
+    // Получение предпочтений пользователя
+    public function getPreferences($userId) {
+        $user = $this->findById($userId);
+        if ($user && !empty($user['preferences'])) {
+            return json_decode($user['preferences'], true);
+        }
+        return ['categories' => []];
+    }
+}
+assets/css
+main.css
 :root{
     --heading: "Roboto", serif;
     --text: "Roboto", serif;
@@ -1971,380 +2196,386 @@ footer .contacts{
 .profile-link:hover svg {
     transform: scale(1.1);
 }
-
-app/core:
-controller.php:
-<?php
-
-class Controller {
-    protected $view;
-
-    public function __construct() {
-        $this->view = new View();
+mobile.css
+/* Mobile-specific styles */
+@media (max-width: 570px) {
+    body {
+        font-size: 14px;
     }
 
-    // Проверка авторизации
-    protected function checkAuth() {
-        if (!isset($_SESSION['user_id'])) {
-            $_SESSION['redirect_to'] = $_SERVER['REQUEST_URI'];
-            header('Location: /login.php');
-            exit();
-        }
+    .header {
+        padding: 0.5dvh 1dvw;
     }
 
-    // Получение текущего пользователя
-    protected function getCurrentUser() {
-        if (isset($_SESSION['user_id'])) {
-            $userModel = new UserModel();
-            return $userModel->findById($_SESSION['user_id']);
-        }
-        return null;
+    .logoholder {
+        padding: 0.5dvh 0;
     }
 
-    // Редирект
-    protected function redirect($url) {
-        header("Location: $url");
-        exit();
+    .mains {
+        font-size: 1.8rem;
+        margin-left: 0.5dvw;
     }
 
-    // JSON ответ
-    protected function json($data) {
-        header('Content-Type: application/json');
-        echo json_encode($data);
-        exit();
-    }
-}
-database.php:
-<?php
-
-class Database {
-    private static $instance = null;
-    private $pdo;
-    private $host;
-    private $dbname;
-    private $username;
-    private $password;
-
-    private function __construct() {
-
-        // Подключаем конфиг
-        require_once __DIR__ . '/../../config/database.php';
-
-        $this->host = DB_HOST;
-        $this->dbname = DB_NAME;
-        $this->username = DB_USER;
-        $this->password = DB_PASS;
-
-        try {
-            $this->pdo = new PDO(
-                "mysql:host={$this->host};dbname={$this->dbname};charset=utf8",
-                $this->username,
-                $this->password,
-                [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                    PDO::ATTR_EMULATE_PREPARES => false,
-                ]
-            );
-        } catch (PDOException $e) {
-            throw new Exception("Connection failed: " . $e->getMessage());
-        }
+    .hamburger {
+        width: 3.5dvh;
     }
 
-    // Запрещаем клонирование
-    private function __clone() {}
-
-    // Запрещаем восстановление
-    public function __wakeup() {
-        throw new Exception("Cannot unserialize singleton");
+    .rightpanel {
+        flex-direction: column;
+        align-items: flex-end;
     }
 
-    // Получить экземпляр (Singleton)
-    public static function getInstance() {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-        return self::$instance;
+    .rpl {
+        width: 3dvw;
+        margin: 0.5dvh 0 0 0.5dvw;
     }
 
-    // Получить PDO соединение
-    public function getConnection() {
-        return $this->pdo;
+    .nav ul {
+        display: none;
     }
 
-    // Выполнить запрос SELECT
-    public function query($sql, $params = []) {
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll();
+    .tssection {
+        padding: 20px;
+        margin: 5dvh 0;
     }
 
-    // Выполнить запрос INSERT/UPDATE/DELETE
-    public function execute($sql, $params = []) {
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute($params);
+    .tssection h2 {
+        font-size: 1.8rem;
+        margin-bottom: 1dvh;
     }
 
-    // Получить последний ID после INSERT
-    public function lastInsertId() {
-        return $this->pdo->lastInsertId();
-    }
-}
-view.php:
-<?php
-
-class View {
-    public function render($view, $data = []) {
-        extract($data);
-
-        // Подключаем layout
-        include '../header.php';
-        include "../app/views/{$view}.php";
-        include '../footer.php';
+    .tssqr {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 1dvh;
     }
 
-    public function renderPartial($view, $data = []) {
-        extract($data);
-        include "../app/views/{$view}.php";
-    }
-}
-models/
-NewsModel.php:
-<?php
-
-class NewsModel {
-    protected $db;
-
-    public function __construct() {
-        $this->db = Database::getInstance();
+    .imgts {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin-bottom: 1dvh;
     }
 
-    // Получить последние новости
-    public function getLatest($limit = 10, $offset = 0) {
-        $sql = "SELECT n.*, c.name as category_name, c.slug as category_slug,
-                u.username as author_name
-                FROM news n
-                JOIN categories c ON n.category_id = c.id
-                JOIN users u ON n.author_id = u.id
-                WHERE n.is_published = 1
-                ORDER BY n.published_at DESC
-                LIMIT :limit OFFSET :offset";
-
-        $stmt = $this->db->getConnection()->prepare($sql);
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-        $stmt->execute();
-
-        return $stmt->fetchAll();
+    .tstext {
+        width: 100%;
+        margin-left: 0;
     }
 
-    // Получить новости по категории
-    public function getByCategory($categoryId, $limit = 10, $offset = 0) {
-        $sql = "SELECT n.*, c.name as category_name, c.slug as category_slug,
-                u.username as author_name
-                FROM news n
-                JOIN categories c ON n.category_id = c.id
-                JOIN users u ON n.author_id = u.id
-                WHERE n.category_id = :category_id AND n.is_published = 1
-                ORDER BY n.published_at DESC
-                LIMIT :limit OFFSET :offset";
-
-        $stmt = $this->db->getConnection()->prepare($sql);
-        $stmt->bindValue(':category_id', $categoryId, PDO::PARAM_INT);
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-        $stmt->execute();
-
-        return $stmt->fetchAll();
+    .foryouh2 {
+        width: 100%;
+        margin: 1dvh 0;
     }
 
-    // Получить новости по ключевому слову
-    public function search($keyword, $limit = 10, $offset = 0) {
-        $sql = "SELECT n.*, c.name as category_name, c.slug as category_slug,
-                u.username as author_name
-                FROM news n
-                JOIN categories c ON n.category_id = c.id
-                JOIN users u ON n.author_id = u.id
-                WHERE (n.title LIKE :keyword OR n.content LIKE :keyword)
-                AND n.is_published = 1
-                ORDER BY n.published_at DESC
-                LIMIT :limit OFFSET :offset";
-
-        $stmt = $this->db->getConnection()->prepare($sql);
-        $stmt->bindValue(':keyword', "%{$keyword}%", PDO::PARAM_STR);
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-        $stmt->execute();
-
-        return $stmt->fetchAll();
+    .foryouin {
+        width: 100%;
+        padding: 0 1dvw;
     }
 
-    // Получить рекомендуемые новости для пользователя
-    public function getRecommendedForUser($userId, $limit = 10) {
-        // Получаем предпочтения пользователя
-        $userModel = new UserModel();
-        $preferences = $userModel->getPreferences($userId);
-
-        if (empty($preferences['categories'])) {
-            // Если нет предпочтений, возвращаем последние новости
-            return $this->getLatest($limit);
-        }
-
-        // Формируем запрос для рекомендаций на основе предпочтений
-        $categoryIds = implode(',', array_map('intval', $preferences['categories']));
-
-        $sql = "SELECT n.*, c.name as category_name, c.slug as category_slug,
-                u.username as author_name
-                FROM news n
-                JOIN categories c ON n.category_id = c.id
-                JOIN users u ON n.author_id = u.id
-                WHERE n.category_id IN ({$categoryIds}) AND n.is_published = 1
-                ORDER BY n.published_at DESC
-                LIMIT :limit";
-
-        $stmt = $this->db->getConnection()->prepare($sql);
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->execute();
-
-        $results = $stmt->fetchAll();
-
-        // Если не хватает новостей, добавляем последние
-        if (count($results) < $limit) {
-            $additional = $this->getLatest($limit - count($results));
-            $results = array_merge($results, $additional);
-        }
-
-        return $results;
+    .row {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        grid-column-gap: 0;
+        grid-row-gap: 1dvh;
+        margin: 1dvh 0;
     }
 
-    // Увеличить счетчик просмотров
-    public function incrementViews($id) {
-        $sql = "UPDATE news SET views = views + 1 WHERE id = :id";
-        return $this->db->execute($sql, ['id' => $id]);
+    .rect {
+        width: 100%;
+        margin-bottom: 1dvh;
     }
 
-    // Получить полную информацию о новости
-    public function getFullNews($id) {
-        $sql = "SELECT n.*, c.name as category_name, c.slug as category_slug,
-                u.username as author_name, u.id as author_id
-                FROM news n
-                JOIN categories c ON n.category_id = c.id
-                JOIN users u ON n.author_id = u.id
-                WHERE n.id = :id AND n.is_published = 1";
-
-        $result = $this->db->query($sql, ['id' => $id]);
-        return !empty($result) ? $result[0] : null;
+    .rectimg {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin: 1dvh 0;
     }
 
-    // Получить все категории
-    public function getAllCategories() {
-        $sql = "SELECT * FROM categories ORDER BY name ASC";
-        return $this->db->query($sql);
+    .recttxt {
+        width: 100%;
+        margin: 1dvh 0;
+    }
+
+    .rectp {
+        margin: 0.5dvh 0;
+    }
+
+    .back {
+        margin: 1dvh 0;
+        padding: 10px;
+    }
+
+    footer {
+        height: 60dvh;
+    }
+
+    .modal-window {
+        width: 90%;
+        padding: 1.5rem;
+        margin: 1rem;
+    }
+
+    .profile-container {
+        width: 95%;
+        padding: 2dvh;
+    }
+
+    .profile-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .profile-avatar-container {
+        margin-right: 0;
+        margin-bottom: 1dvh;
+    }
+
+    .profile-stats {
+        flex-direction: column;
+        gap: 1dvh;
+    }
+
+    .profile-section {
+        margin: 2dvh 0;
+        padding: 2dvh;
+    }
+
+    .settings-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .interests-list {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .interest-tag {
+        margin: 0.5dvh 0;
+    }
+
+    .category-preferences {
+        margin-bottom: 1dvh;
+    }
+
+    .preference-item {
+        margin-bottom: 0.5dvh;
+    }
+
+    .btn {
+        width: 100%;
+        margin-top: 1dvh;
+    }
+
+    .btn-logout, .btn-delete {
+        width: 100%;
+        margin-bottom: 1dvh;
+        margin-right: 0;
     }
 }
-UserModel.php:
-<?php
+assets/js
+navbar.js
+const navBar = document.querySelector('.header')
+function observe(entries){
+    if(entries[0].isIntersecting){
+        navBar.classList.add('sticky')
+    }
+    if(!entries[0].isIntersecting){
+        navBar.classList.remove('sticky')
+    }
+}
+const observer = new IntersectionObserver(observe,{
+    threshold:[0],
+    rootMargin:'100px'
+})
+observer.observe(navBar)
+phone.js
+let input = document.querySelector('.phone');
+input.addEventListener('input', function(e){
+    if(e.inputType === 'deleteContentForward' || e.inputType === 'deleteContentBackward') return false
+    this.value = this.value.replace(/\D/g,'')
+    if(/^[8]/.test(this.value)){
+        this.value = this.value.replace(/^[8]/, '+7')
+    }else{
+        this.value = '+' + this.value
+    }
+    let start = 2;
+    let max = 14
+    let obj = {
+        0: '(',
+        4: ')',
+        8: '-',
+        11: '-',
+    }
+    for (let char in obj){
+        if(this.value[start+(+char)]) {
+            this.value = this.value.substring(0, start+(+char)) + obj[char] + this.value.substring(start+(+char))
+        }
+    }
+    if(this.value[max+start]){
+        this.value = this.value.substring(0, start + max)
+    }
+})
+script.js
+document.addEventListener('DOMContentLoaded', function() {
+    // Получаем все необходимые элементы
+    const toggleButtons = document.querySelectorAll('.toggle-btn');
+    const loginForm = document.querySelector('.login-form');
+    const registerForm = document.querySelector('.register-form');
+    const modalWindow = document.querySelector('.modal-window');
+    const overlay = document.querySelector('.overlay');
+    const closeModalBtn = document.querySelector('.btn--close-modal-window');
 
-class UserModel {
-    protected $db;
+    // 🔴 УБРАЛИ: const showModalBtns = ... и весь связанный код!
 
-    public function __construct() {
-        $this->db = Database::getInstance();
+    // Функция переключения форм
+    function switchForm(tabName) {
+        toggleButtons.forEach(btn => btn.classList.remove('active'));
+        if (loginForm) loginForm.style.display = 'none';
+        if (registerForm) registerForm.style.display = 'none';
+
+        if (tabName === 'login') {
+            const loginBtn = document.querySelector('[data-tab="login"]');
+            if (loginBtn) loginBtn.classList.add('active');
+            if (loginForm) loginForm.style.display = 'flex';
+        } else if (tabName === 'register') {
+            const registerBtn = document.querySelector('[data-tab="register"]');
+            if (registerBtn) registerBtn.classList.add('active');
+            if (registerForm) registerForm.style.display = 'flex';
+        }
     }
 
-    // Авторизация пользователя
-    public function login($email, $password) {
-        $sql = "SELECT * FROM users WHERE email = :email";
-        $result = $this->db->query($sql, ['email' => $email]);
+    // 🔴 ОБНОВЛЕННАЯ ФУНКЦИЯ openModal — теперь она используется ТОЛЬКО через profileLink
+    function openModal() {
+        if (modalWindow) modalWindow.classList.remove('hidden');
+        if (overlay) overlay.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        switchForm('login');
+    }
 
-        if (!empty($result)) {
-            $user = $result[0];
-            if (password_verify($password, $user['password_hash'])) {
-                // Обновляем время последнего входа
-                $this->update($user['id'], ['last_login' => date('Y-m-d H:i:s')]);
-                return $user;
+    // Закрытие модального окна
+    function closeModal() {
+        if (modalWindow) modalWindow.classList.add('hidden');
+        if (overlay) overlay.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+
+    // Обработчик клика по табам
+    if (toggleButtons) {
+        toggleButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tab = this.getAttribute('data-tab');
+                if (tab) switchForm(tab);
+            });
+        });
+    }
+
+    // 🔴 НАЗНАЧАЕМ СОБЫТИЕ ТОЛЬКО НА ИКОНКУ ПРОФИЛЯ
+    const profileLink = document.querySelector('.btn--show-modal-window.profile-link');
+    // 🔴 Новый индикатор: есть ли пользователь в системе?
+    const isAuthenticated = document.getElementById('user-authenticated') !== null;
+
+    if (profileLink) {
+        profileLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Проверяем: залогинен ли пользователь?
+            if (isAuthenticated) {
+                // Если да — переходим на профиль
+                window.location.href = '/profile.php';
+            } else {
+                // Если нет — открываем модалку
+                openModal();
             }
+        });
+    }
+
+    // Назначаем событие на кнопку закрытия
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', closeModal);
+    }
+
+    // Закрытие по клику на оверлей
+    if (overlay) {
+        overlay.addEventListener('click', closeModal);
+    }
+
+    // Закрытие по ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !modalWindow.classList.contains('hidden')) {
+            closeModal();
         }
-        return false;
+    });
+
+
+
+    // Инициализация: при загрузке страницы — показать логин
+    switchForm('login');
+});
+
+// Profile Page Functionality
+function initProfilePage() {
+// Обработчик для кнопки удаления аккаунта
+    const deleteBtn = document.querySelector('.btn-delete');
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                alert('Account deleted successfully');
+                window.location.href = '/index.php';
+            }
+        });
     }
-
-    // Регистрация нового пользователя
-    public function register($data) {
-        // Проверка уникальности email
-        $existing = $this->findByEmail($data['email']);
-        if ($existing) {
-            return false;
-        }
-
-        // Хэширование пароля
-        $data['password_hash'] = password_hash($data['password'], PASSWORD_DEFAULT);
-        unset($data['password']);
-        $data['created_at'] = date('Y-m-d H:i:s');
-        $data['last_login'] = date('Y-m-d H:i:s');
-
-        // Установка значений по умолчанию
-        if (!isset($data['preferences'])) {
-            $data['preferences'] = json_encode(['categories' => []]);
-        }
-
-        return $this->create($data);
-    }
-
-    // Поиск пользователя по email
-    public function findByEmail($email) {
-        $sql = "SELECT * FROM users WHERE email = :email";
-        $result = $this->db->query($sql, ['email' => $email]);
-        return !empty($result) ? $result[0] : null;
-    }
-
-    // Получить пользователя по ID
-    public function findById($id) {
-        $sql = "SELECT * FROM users WHERE id = :id";
-        $result = $this->db->query($sql, ['id' => $id]);
-        return !empty($result) ? $result[0] : null;
-    }
-
-    // Создать нового пользователя
-    public function create($data) {
-        $fields = array_keys($data);
-        $placeholders = array_map(function($field) {
-            return ":$field";
-        }, $fields);
-
-        $sql = "INSERT INTO users (" . implode(', ', $fields) . ")
-                VALUES (" . implode(', ', $placeholders) . ")";
-
-        if ($this->db->execute($sql, $data)) {
-            return $this->db->lastInsertId();
-        }
-        return false;
-    }
-
-    // Обновить пользователя
-    public function update($id, $data) {
-        $fields = [];
-        foreach ($data as $key => $value) {
-            $fields[] = "$key = :$key";
-        }
-
-        $sql = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = :id";
-        $data['id'] = $id;
-
-        return $this->db->execute($sql, $data);
-    }
-
-    // Обновление предпочтений пользователя
-    public function updatePreferences($userId, $preferences) {
-        $preferencesJson = json_encode($preferences);
-        return $this->update($userId, ['preferences' => $preferencesJson]);
-    }
-
-    // Получение предпочтений пользователя
-    public function getPreferences($userId) {
-        $user = $this->findById($userId);
-        if ($user && !empty($user['preferences'])) {
-            return json_decode($user['preferences'], true);
-        }
-        return ['categories' => []];
-    }
+    // Обработчики для кнопок настроек
+    const settingButtons = document.querySelectorAll('.btn-secondary');
+    settingButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const action = this.textContent;
+            alert(`${action} feature will be implemented soon!`);
+        });
+    });
 }
+
+// Инициализация функционала профиля при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    if (document.querySelector('.profile-container')) {
+        initProfilePage();
+    }
+});
+slidingmenu.js
+document.addEventListener('DOMContentLoaded', function() {
+    const hamburgerBtn = document.querySelector('.hamburger').closest('a');
+    const slideMenu = document.querySelector('.slide-menu');
+    const closeBtn = document.querySelector('.btn--close-slide-menu');
+    const slideOverlay = document.querySelector('.slide-overlay');
+    const body = document.body;
+    function openMenu() {
+        slideMenu.classList.remove('hidden');
+        slideOverlay.classList.remove('hidden');
+        body.classList.add('menu-open');
+    }
+    function closeMenu() {
+        slideMenu.classList.add('hidden');
+        slideOverlay.classList.add('hidden');
+        body.classList.remove('menu-open');
+    }
+    hamburgerBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        openMenu();
+    });
+    closeBtn.addEventListener('click', closeMenu);
+    slideOverlay.addEventListener('click', closeMenu);
+    // Optional: Close on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeMenu();
+    });
+});
+config/
+database.php
+<?php
+// Конфигурация базы данных
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'news_portal');
+define('DB_USER', 'root');
+define('DB_PASS', 'root');
+?>
