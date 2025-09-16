@@ -1,4 +1,9 @@
 <?php
+// Инициализируем сессию ранним этапом, так как ниже используются $_SESSION
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // Путь к корню проекта
 define('ROOT', dirname(__FILE__));
 

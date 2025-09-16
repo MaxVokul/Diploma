@@ -67,68 +67,9 @@ if ($_POST) {
     <meta charset="UTF-8">
     <title>Создать новость - NEWS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" media="(min-width: 570px)" href="/assets/css/main.css">
-    <link rel="stylesheet" media="(max-width: 570px)" href="/assets/css/mobile.css">
+    <link rel="stylesheet" href="/assets/css/main.css">
     <link href="https://fonts.googleapis.com/css2?family=Aclonica&display=swap" rel="stylesheet">
-    <style>
-        /* Стили для формы */
-        .news-form {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-        }
-        .form-group input[type="text"],
-        .form-group input[type="url"],
-        .form-group input[type="datetime-local"],
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        .form-group textarea {
-            height: 150px;
-            resize: vertical;
-        }
-        .btn-submit {
-            background-color: var(--primary);
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-        .btn-submit:hover {
-            background-color: #a090c0;
-        }
-        .message {
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 4px;
-        }
-        .message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        .message.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-    </style>
+    
 </head>
 <body>
 <?php include '../../header.php'; ?>

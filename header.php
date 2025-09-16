@@ -1,8 +1,20 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-// Инициализация автозагрузчика
-require_once 'app/core/Database.php';
+// Инициализация автозагрузчика/базы
+require_once __DIR__ . '/app/core/Database.php';
+require_once __DIR__ . '/app/models/NewsModel.php';
+
+// Загружаем категории для меню
+$headerCategories = [];
+try {
+    $newsModelForHeader = new NewsModel();
+    $headerCategories = $newsModelForHeader->getAllCategories();
+} catch (Exception $e) {
+    $headerCategories = [];
+}
 
 ?>
 <?php if (isset($_SESSION['registration_errors']) && !empty($_SESSION['registration_errors'])): ?>
@@ -28,11 +40,10 @@ require_once 'app/core/Database.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
 
     <!-- CSS -->
-    <link rel="stylesheet" media="(min-width: 570px)" href="assets/css/main.css">
-    <link rel="stylesheet" media="(max-width: 570px)" href="assets/css/mobile.css">
+    <link rel="stylesheet" href="/assets/css/main.css">
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Aclonica&display=swap" rel="stylesheet">
@@ -44,7 +55,7 @@ require_once 'app/core/Database.php';
 <header class="header">
     <div class="logoholder">
         <a href="#">
-            <img class="hamburger" src="resources/Hamburger_icon1.png" alt="Menu">
+            <img class="hamburger" src="/resources/Hamburger_icon1.png" alt="Menu">
         </a>
         <a href="/index.php">
             <div class="mains">NEWS</div>
@@ -80,7 +91,7 @@ require_once 'app/core/Database.php';
             </a>
             <ol class="ol2">
                 <li>
-                    <a href="index.php">Home</a>
+                    <a href="/index.php">Home</a>
                 </li>
                 <li>
                     <a href="#">For you</a>
@@ -92,21 +103,21 @@ require_once 'app/core/Database.php';
                     <a href="#">World</a>
                 </li>
                 <li>
-                    <a href="aboutus.html">About us</a>
+                    <a href="/aboutus.html">About us</a>
                 </li>
             </ol>
         </li>
     </ol>
     <div class="nav">
         <ul><li>
-                <a href="index.php">
+                <a href="/index.php">
                     <h3>Home</h3>
                 </a>
                 </a></li>
             <li><a href="#fy"><h3>For you</h3></a></li>
             <li><h3>Following</h3></li>
             <li><h3>World</h3></li>
-            <a href="aboutus.html">
+            <a href="/aboutus.html">
                 <li id="right"><h3>About us</h3></li>
             </a>
         </ul>
@@ -168,7 +179,7 @@ require_once 'app/core/Database.php';
         <button class="toggle-btn" data-tab="register">Register</button>
     </div>
     <!-- Login Form -->
-    <form class="modal__form login-form" style="display: flex;"action="/login-process.php" method="POST">
+    <form class="modal__form login-form" style="display: flex;" action="/login-process.php" method="POST">
         <label for="login-email">Email</label>
         <input type="email" id="login-email" name="email" placeholder="Enter your email" required>
         <label for="login-password">Password</label>
@@ -198,13 +209,17 @@ require_once 'app/core/Database.php';
         <button class="btn--close-slide-menu">×</button>
         <nav class="slide-nav">
             <ul>
-                <li><a href="/category.php?category=political">Political</a></li>
-                <li><a href="/category.php?category=nature">Nature</a></li>
-                <li><a href="/category.php?category=society">Society</a></li>
-                <li><a href="/category.php?category=world">World</a></li>
-                <li><a href="/category.php?category=technology">Technology</a></li>
-                <li><a href="/category.php?category=culture">Culture</a></li>
-                <li><a href="/category.php?category=sports">Sports</a></li>
+                <?php if (!empty($headerCategories)): ?>
+                    <?php foreach ($headerCategories as $cat): ?>
+                        <li>
+                            <a href="/category.php?category=<?php echo htmlspecialchars($cat['slug']); ?>">
+                                <?php echo htmlspecialchars($cat['name']); ?>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <li><a href="#">No categories</a></li>
+                <?php endif; ?>
             </ul>
         </nav>
     </div>

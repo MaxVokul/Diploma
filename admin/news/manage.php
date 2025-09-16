@@ -28,49 +28,9 @@ $allNews = $newsModel->getLatest(100); // Получаем последние 10
     <meta charset="UTF-8">
     <title>Управление новостями - NEWS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" media="(min-width: 570px)" href="/assets/css/main.css">
-    <link rel="stylesheet" media="(max-width: 570px)" href="/assets/css/mobile.css">
+    <link rel="stylesheet" href="/assets/css/main.css">
     <link href="https://fonts.googleapis.com/css2?family=Aclonica&display=swap" rel="stylesheet">
-    <style>
-        /* Стили для таблицы новостей */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        .actions a {
-            margin-right: 10px;
-            text-decoration: none;
-            color: var(--primary);
-            font-weight: 500;
-        }
-        .actions a:hover {
-            text-decoration: underline;
-        }
-        .btn-create {
-            display: inline-block;
-            padding: 10px 15px;
-            background-color: var(--primary);
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        .btn-create:hover {
-            background-color: #a090c0;
-        }
-    </style>
+    
 </head>
 <body>
 <?php include '../../header.php'; ?>
