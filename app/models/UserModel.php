@@ -103,4 +103,10 @@ class UserModel {
         }
         return ['categories' => []];
     }
+    // Проверяет, является ли пользователь администратором
+    public function isAdmin($userId) {
+        $sql = "SELECT `is_admin` FROM `users` WHERE `id` = :id LIMIT 1";
+        $result = $this->db->query($sql, ['id' => $userId]);
+        return !empty($result) && (bool)$result[0]['is_admin'];
+    }
 }

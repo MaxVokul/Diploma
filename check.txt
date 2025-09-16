@@ -2579,3 +2579,262 @@ define('DB_NAME', 'news_portal');
 define('DB_USER', 'root');
 define('DB_PASS', 'root');
 ?>
+Моя база данных:
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+- phpMyAdmin XML Dump
+- version 5.2.2
+- https://www.phpmyadmin.net
+-
+- Хост: MySQL-8.0
+- Время создания: Сен 16 2025 г., 20:21
+- Версия сервера: 8.0.42
+- Версия PHP: 8.1.28
+-->
+
+<pma_xml_export version="1.0" xmlns:pma="https://www.phpmyadmin.net/some_doc_url/">
+    <!--
+    - Structure schemas
+    -->
+    <pma:structure_schemas>
+        <pma:database name="news_portal" collation="utf8mb4_unicode_ci" charset="utf8mb4">
+            <pma:table name="categories">
+                CREATE TABLE `categories` (
+                  `id` int NOT NULL AUTO_INCREMENT,
+                  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+                  `slug` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+                  `description` text COLLATE utf8mb4_unicode_ci,
+                  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+                  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                  PRIMARY KEY (`id`),
+                  UNIQUE KEY `name` (`name`),
+                  UNIQUE KEY `slug` (`slug`)
+                ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+            </pma:table>
+            <pma:table name="news">
+                CREATE TABLE `news` (
+                  `id` int NOT NULL AUTO_INCREMENT,
+                  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+                  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
+                  `excerpt` text COLLATE utf8mb4_unicode_ci,
+                  `image_url` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                  `category_id` int NOT NULL,
+                  `author_id` int NOT NULL,
+                  `published_at` datetime NOT NULL,
+                  `views` int DEFAULT &#039;0&#039;,
+                  `is_published` tinyint(1) DEFAULT &#039;1&#039;,
+                  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+                  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                  PRIMARY KEY (`id`),
+                  KEY `author_id` (`author_id`),
+                  KEY `idx_category_published` (`category_id`,`is_published`),
+                  KEY `idx_published_date` (`is_published`,`published_at`),
+                  CONSTRAINT `news_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE,
+                  CONSTRAINT `news_ibfk_2` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+                ) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+            </pma:table>
+            <pma:table name="users">
+                CREATE TABLE `users` (
+                  `id` int NOT NULL AUTO_INCREMENT,
+                  `username` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+                  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+                  `password_hash` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+                  `phone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                  `preferences` text COLLATE utf8mb4_unicode_ci,
+                  `created_at` datetime NOT NULL,
+                  `last_login` datetime NOT NULL,
+                  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                  PRIMARY KEY (`id`),
+                  UNIQUE KEY `username` (`username`),
+                  UNIQUE KEY `email` (`email`)
+                ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+            </pma:table>
+            <pma:table name="user_interests">
+                CREATE TABLE `user_interests` (
+                  `id` int NOT NULL AUTO_INCREMENT,
+                  `user_id` int NOT NULL,
+                  `category_id` int NOT NULL,
+                  `weight` int DEFAULT &#039;1&#039;,
+                  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+                  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                  PRIMARY KEY (`id`),
+                  UNIQUE KEY `unique_user_category` (`user_id`,`category_id`),
+                  KEY `category_id` (`category_id`),
+                  CONSTRAINT `user_interests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+                  CONSTRAINT `user_interests_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+            </pma:table>
+        </pma:database>
+    </pma:structure_schemas>
+
+    <!--
+    - База данных: 'news_portal'
+    -->
+    <database name="news_portal">
+        <!-- Таблица categories -->
+        <table name="categories">
+            <column name="id">1</column>
+            <column name="name">Politics</column>
+            <column name="slug">politics</column>
+            <column name="description">Political news and analysis</column>
+            <column name="created_at">2025-09-14 22:13:17</column>
+            <column name="updated_at">2025-09-14 22:13:17</column>
+        </table>
+        <table name="categories">
+            <column name="id">2</column>
+            <column name="name">World</column>
+            <column name="slug">world</column>
+            <column name="description">International news from around the globe</column>
+            <column name="created_at">2025-09-14 22:13:17</column>
+            <column name="updated_at">2025-09-14 22:13:17</column>
+        </table>
+        <table name="categories">
+            <column name="id">3</column>
+            <column name="name">Technology</column>
+            <column name="slug">technology</column>
+            <column name="description">Latest tech news and innovations</column>
+            <column name="created_at">2025-09-14 22:13:17</column>
+            <column name="updated_at">2025-09-14 22:13:17</column>
+        </table>
+        <table name="categories">
+            <column name="id">4</column>
+            <column name="name">Science</column>
+            <column name="slug">science</column>
+            <column name="description">Scientific discoveries and research</column>
+            <column name="created_at">2025-09-14 22:13:17</column>
+            <column name="updated_at">2025-09-14 22:13:17</column>
+        </table>
+        <table name="categories">
+            <column name="id">5</column>
+            <column name="name">Health</column>
+            <column name="slug">health</column>
+            <column name="description">Health and medical news</column>
+            <column name="created_at">2025-09-14 22:13:17</column>
+            <column name="updated_at">2025-09-14 22:13:17</column>
+        </table>
+        <table name="categories">
+            <column name="id">6</column>
+            <column name="name">Sports</column>
+            <column name="slug">sports</column>
+            <column name="description">Sports news and updates</column>
+            <column name="created_at">2025-09-14 22:13:17</column>
+            <column name="updated_at">2025-09-14 22:13:17</column>
+        </table>
+        <table name="categories">
+            <column name="id">7</column>
+            <column name="name">Entertainment</column>
+            <column name="slug">entertainment</column>
+            <column name="description">Celebrity and entertainment news</column>
+            <column name="created_at">2025-09-14 22:13:17</column>
+            <column name="updated_at">2025-09-14 22:13:17</column>
+        </table>
+        <table name="categories">
+            <column name="id">8</column>
+            <column name="name">Business</column>
+            <column name="slug">business</column>
+            <column name="description">Business and financial news</column>
+            <column name="created_at">2025-09-14 22:13:17</column>
+            <column name="updated_at">2025-09-14 22:13:17</column>
+        </table>
+        <table name="categories">
+            <column name="id">9</column>
+            <column name="name">Culture</column>
+            <column name="slug">culture</column>
+            <column name="description">Arts, culture and lifestyle</column>
+            <column name="created_at">2025-09-14 22:13:17</column>
+            <column name="updated_at">2025-09-14 22:13:17</column>
+        </table>
+        <table name="categories">
+            <column name="id">10</column>
+            <column name="name">Environment</column>
+            <column name="slug">environment</column>
+            <column name="description">Environmental news and climate change</column>
+            <column name="created_at">2025-09-14 22:13:17</column>
+            <column name="updated_at">2025-09-14 22:13:17</column>
+        </table>
+        <!-- Таблица news -->
+        <table name="news">
+            <column name="id">11</column>
+            <column name="title">The Future of AI in Healthcare</column>
+            <column name="content">Detailed article about how artificial intelligence is transforming the healthcare industry...</column>
+            <column name="excerpt">AI is revolutionizing healthcare with new diagnostic tools and personalized treatment plans.</column>
+            <column name="image_url">/images/ai-healthcare.jpg</column>
+            <column name="category_id">4</column>
+            <column name="author_id">1</column>
+            <column name="published_at">2025-09-14 22:14:30</column>
+            <column name="views">1250</column>
+            <column name="is_published">1</column>
+            <column name="created_at">2025-09-14 22:14:30</column>
+            <column name="updated_at">2025-09-14 22:14:30</column>
+        </table>
+        <table name="news">
+            <column name="id">12</column>
+            <column name="title">Global Climate Summit Reaches Historic Agreement</column>
+            <column name="content">World leaders have agreed on a comprehensive plan to combat climate change...</column>
+            <column name="excerpt">Nations commit to ambitious carbon reduction targets in landmark climate deal.</column>
+            <column name="image_url">/images/climate-summit.jpg</column>
+            <column name="category_id">2</column>
+            <column name="author_id">1</column>
+            <column name="published_at">2025-09-13 22:14:30</column>
+            <column name="views">3420</column>
+            <column name="is_published">1</column>
+            <column name="created_at">2025-09-14 22:14:30</column>
+            <column name="updated_at">2025-09-14 22:14:30</column>
+        </table>
+        <table name="news">
+            <column name="id">13</column>
+            <column name="title">New Smartphone Breaks Sales Records</column>
+            <column name="content">The latest flagship smartphone has shattered sales records in its first week...</column>
+            <column name="excerpt">Innovative features and competitive pricing drive unprecedented demand.</column>
+            <column name="image_url">/images/smartphone.jpg</column>
+            <column name="category_id">3</column>
+            <column name="author_id">1</column>
+            <column name="published_at">2025-09-12 22:14:30</column>
+            <column name="views">5678</column>
+            <column name="is_published">1</column>
+            <column name="created_at">2025-09-14 22:14:30</column>
+            <column name="updated_at">2025-09-14 22:14:30</column>
+        </table>
+        <table name="news">
+            <column name="id">14</column>
+            <column name="title">Stock Market Reaches All-Time High</column>
+            <column name="content">Investors celebrate as major indices hit record levels amid strong economic data...</column>
+            <column name="excerpt">Bull market continues as corporate earnings exceed expectations.</column>
+            <column name="image_url">/images/stock-market.jpg</column>
+            <column name="category_id">8</column>
+            <column name="author_id">1</column>
+            <column name="published_at">2025-09-11 22:14:30</column>
+            <column name="views">2345</column>
+            <column name="is_published">1</column>
+            <column name="created_at">2025-09-14 22:14:30</column>
+            <column name="updated_at">2025-09-14 22:14:30</column>
+        </table>
+        <table name="news">
+            <column name="id">15</column>
+            <column name="title">Major Breakthrough in Cancer Research</column>
+            <column name="content">Scientists announce a promising new treatment approach that could revolutionize cancer care...</column>
+            <column name="excerpt">Clinical trials show remarkable results with minimal side effects.</column>
+            <column name="image_url">/images/cancer-research.jpg</column>
+            <column name="category_id">5</column>
+            <column name="author_id">1</column>
+            <column name="published_at">2025-09-10 22:14:30</column>
+            <column name="views">4123</column>
+            <column name="is_published">1</column>
+            <column name="created_at">2025-09-14 22:14:30</column>
+            <column name="updated_at">2025-09-14 22:14:30</column>
+        </table>
+        <!-- Таблица users -->
+        <table name="users">
+            <column name="id">1</column>
+            <column name="username">maks</column>
+            <column name="email">maksvokulov@mail.ru</column>
+            <column name="password_hash">$2y$10$IpKrXJfbV6HmfU8hp3GT0.CGhOEYY7LA9nTwi7euSMPlWPm.Am5tC</column>
+            <column name="phone"></column>
+            <column name="preferences">{&quot;categories&quot;:[]}</column>
+            <column name="created_at">2025-09-14 23:35:32</column>
+            <column name="last_login">2025-09-15 20:52:25</column>
+            <column name="updated_at">2025-09-15 20:52:25</column>
+        </table>
+        <!-- Таблица user_interests -->
+    </database>
+</pma_xml_export>

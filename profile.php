@@ -19,7 +19,7 @@ $userData = $userModel->findById($_SESSION['user_id']);
 // Получаем предпочтения пользователя
 $preferences = $userModel->getPreferences($_SESSION['user_id']);
 
-// Получаем статистику пользователя (в реальном приложении это было бы отдельной таблицей)
+// Получаем статистику пользователя
 $stats = [
     'articles_read' => 47,
     'comments_posted' => 12,
@@ -121,6 +121,18 @@ $categories = $newsModel->getAllCategories();
             <a href="/logout.php" class="btn btn-logout">Logout</a>
             <a href="#" class="btn btn-delete" onclick="alert('Delete account feature will be implemented soon!')">Delete Account</a>
         </div>
+        <?php if ($userModel->isAdmin($_SESSION['user_id'])): ?>
+            <div class="profile-section">
+                <h2 class="section-title">Администрирование</h2>
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <h3>Управление новостями</h3>
+                        <p>Создавайте, редактируйте и удаляйте новости</p>
+                        <a href="/admin/" class="btn btn-secondary">Перейти в админку</a>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
     </div>
 
 <?php require_once 'footer.php'; ?>
