@@ -109,4 +109,23 @@ class UserModel {
         $result = $this->db->query($sql, ['id' => $userId]);
         return !empty($result) && (bool)$result[0]['is_admin'];
     }
+
+    // Проверить, что email свободен (кроме текущего пользователя)
+    public function isEmailAvailableForUser($email, $userId) {
+        $sql = "SELECT id FROM users WHERE email = :email LIMIT 1";
+        $result = $this->db->query($sql, ['email' => $email]);
+        if (empty($result)) return true;
+        return (int)$result[0]['id'] === (int)$userId;
+    }
+
+    // Обновить пароль пользователя (при предварительной проверке текущего пароля)
+    public function updatePassword($userId, $currentPlainPassword, $newPlainPassword) {
+        $user = $this->findById($userId);
+        if (!$user) return false;
+        if (!password_verify($currentPlainPassword, $user['password_hash'])) {
+            return false;
+        }
+        $newHash = password_hash($newPlainPassword, PASSWORD_DEFAULT);
+        return $this->update($userId, ['password_hash' => $newHash]);
+    }
 }

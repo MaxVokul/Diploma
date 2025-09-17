@@ -19,11 +19,18 @@ $userData = $userModel->findById($_SESSION['user_id']);
 // Получаем предпочтения пользователя
 $preferences = $userModel->getPreferences($_SESSION['user_id']);
 
-// Получаем статистику пользователя
+// Сообщения (флеш)
+$flash_success = $_SESSION['profile_success'] ?? '';
+$flash_error = $_SESSION['profile_error'] ?? '';
+unset($_SESSION['profile_success'], $_SESSION['profile_error']);
+
+// Получаем доступную статистику пользователя
+// Примечание: полноценный трекинг прочитанных статей/комментариев требует отдельных таблиц.
+// Здесь считаем: following = кол-во выбранных категорий; остальные пока 0.
 $stats = [
-    'articles_read' => 47,
-    'comments_posted' => 12,
-    'following' => 8
+    'articles_read' => 0,
+    'comments_posted' => 0,
+    'following' => is_array($preferences['categories']) ? count($preferences['categories']) : 0
 ];
 
 // Получаем категории для выбора
@@ -50,6 +57,13 @@ $categories = $newsModel->getAllCategories();
             </div>
         </div>
 
+        <?php if ($flash_success): ?>
+            <div class="message success" style="margin: 1rem 0;"><?php echo htmlspecialchars($flash_success); ?></div>
+        <?php endif; ?>
+        <?php if ($flash_error): ?>
+            <div class="message error" style="margin: 1rem 0;"><?php echo htmlspecialchars($flash_error); ?></div>
+        <?php endif; ?>
+
         <div class="profile-stats">
             <div class="stat-item">
                 <div class="stat-number"><?php echo $stats['articles_read']; ?></div>
@@ -71,12 +85,26 @@ $categories = $newsModel->getAllCategories();
                 <div class="setting-item">
                     <h3>Change Password</h3>
                     <p>Update your account password</p>
-                    <a href="#" class="btn btn-secondary" onclick="alert('Change password feature will be implemented soon!')">Change Password</a>
+                    <form action="/change-password.php" method="POST" class="form form-vertical">
+                        <label for="current_password">Current password</label>
+                        <input type="password" id="current_password" name="current_password" required>
+                        <label for="new_password">New password</label>
+                        <input type="password" id="new_password" name="new_password" minlength="6" required>
+                        <label for="confirm_password">Confirm new password</label>
+                        <input type="password" id="confirm_password" name="confirm_password" minlength="6" required>
+                        <button type="submit" class="btn btn-secondary">Change Password</button>
+                    </form>
                 </div>
                 <div class="setting-item">
                     <h3>Update Profile</h3>
                     <p>Edit your personal information</p>
-                    <a href="#" class="btn btn-secondary" onclick="alert('Edit profile feature will be implemented soon!')">Edit Profile</a>
+                    <form action="/update-profile.php" method="POST" class="form form-vertical">
+                        <label for="upd_username">Username</label>
+                        <input type="text" id="upd_username" name="username" value="<?php echo htmlspecialchars($userData['username']); ?>" required>
+                        <label for="upd_email">Email</label>
+                        <input type="email" id="upd_email" name="email" value="<?php echo htmlspecialchars($userData['email']); ?>" required>
+                        <button type="submit" class="btn btn-secondary">Save Changes</button>
+                    </form>
                 </div>
                 <div class="setting-item">
                     <h3>Notification Settings</h3>
