@@ -51,9 +51,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 🔴 НАЗНАЧАЕМ СОБЫТИЕ ТОЛЬКО НА ИКОНКУ ПРОФИЛЯ
+    // НАЗНАЧАЕМ СОБЫТИЕ ТОЛЬКО НА ИКОНКУ ПРОФИЛЯ
     const profileLink = document.querySelector('.btn--show-modal-window.profile-link');
-    // 🔴 Новый индикатор: есть ли пользователь в системе?
+    // Новый индикатор: есть ли пользователь в системе?
     const isAuthenticated = document.getElementById('user-authenticated') !== null;
 
     if (profileLink) {
@@ -106,12 +106,13 @@ function initProfilePage() {
             }
         });
     }
-    // Обработчики для кнопок настроек
-    const settingButtons = document.querySelectorAll('.btn-secondary');
-    settingButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
+    // Обработчики для кнопок настроек (ТОЛЬКО для ссылок)
+    const settingLinkButtons = document.querySelectorAll('a.btn-secondary');
+    settingLinkButtons.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Оставляем поведение форм неперехваченным
             e.preventDefault();
-            const action = this.textContent;
+            const action = this.textContent.trim();
             alert(`${action} feature will be implemented soon!`);
         });
     });
