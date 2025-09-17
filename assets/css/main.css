@@ -1059,12 +1059,10 @@ footer .contacts{
 .setting-item .form.form-vertical input[type="email"],
 .setting-item .form.form-vertical input[type="password"],
 .setting-item .form.form-vertical input[type="tel"] {
-    width: 100%;
     max-width: 420px;
     padding: 10px 12px;
     border: 1px solid #ddd;
     border-radius: 8px;
-    outline: none;
 }
 
 .setting-item .form.form-vertical input:focus {
@@ -1084,6 +1082,19 @@ footer .contacts{
     .setting-item .form.form-vertical input[type="tel"] {
         max-width: 100%;
     }
+}
+
+/* Interest tags with weight */
+.interest-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.interest-weight {
+    font-size: 0.8em;
+    opacity: 0.7;
+    font-weight: normal;
 }
 .admin-stats {
     display: flex;

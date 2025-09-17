@@ -19,19 +19,17 @@ $userData = $userModel->findById($_SESSION['user_id']);
 // Получаем предпочтения пользователя
 $preferences = $userModel->getPreferences($_SESSION['user_id']);
 
+// Получаем интересы пользователя из таблицы user_interests
+$userInterests = $userModel->getUserInterests($_SESSION['user_id']);
+
 // Сообщения (флеш)
 $flash_success = $_SESSION['profile_success'] ?? '';
 $flash_error = $_SESSION['profile_error'] ?? '';
 unset($_SESSION['profile_success'], $_SESSION['profile_error']);
 
-// Получаем доступную статистику пользователя
-// Примечание: полноценный трекинг прочитанных статей/комментариев требует отдельных таблиц.
-// Здесь считаем: following = кол-во выбранных категорий; остальные пока 0.
-$stats = [
-    'articles_read' => 0,
-    'comments_posted' => 0,
-    'following' => is_array($preferences['categories']) ? count($preferences['categories']) : 0
-];
+// Получаем реальную статистику пользователя
+$stats = $userModel->getReadStats($_SESSION['user_id']);
+$stats['comments_posted'] = 0; // Пока нет системы комментариев
 
 // Получаем категории для выбора
 $newsModel = new NewsModel();
@@ -124,11 +122,16 @@ $categories = $newsModel->getAllCategories();
             <div class="interests-container">
                 <p class="interests-description">Based on your reading history and preferences</p>
                 <div class="interests-list">
-                    <?php foreach($preferences['categories'] as $categoryName): ?>
-                        <div class="interest-tag">
-                            <?php echo htmlspecialchars($categoryName); ?>
-                        </div>
-                    <?php endforeach; ?>
+                    <?php if (!empty($userInterests)): ?>
+                        <?php foreach($userInterests as $interest): ?>
+                            <div class="interest-tag">
+                                <?php echo htmlspecialchars($interest['name']); ?>
+                                <span class="interest-weight">(<?php echo $interest['weight']; ?> reads)</span>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p>No reading history yet. Start reading articles to build your interests!</p>
+                    <?php endif; ?>
                 </div>
                 <form id="preferences-form" method="POST" action="/update-preferences.php">
                     <div class="category-preferences">

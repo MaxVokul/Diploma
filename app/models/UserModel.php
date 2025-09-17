@@ -128,4 +128,88 @@ class UserModel {
         $newHash = password_hash($newPlainPassword, PASSWORD_DEFAULT);
         return $this->update($userId, ['password_hash' => $newHash]);
     }
+
+    // Отметить статью как прочитанную пользователем
+    public function markArticleAsRead($userId, $articleId, $categoryId) {
+        $sql = "INSERT IGNORE INTO user_article_reads (user_id, article_id, category_id) 
+                VALUES (:user_id, :article_id, :category_id)";
+        try {
+            $stmt = $this->db->getConnection()->prepare($sql);
+            $result = $stmt->execute([
+                ':user_id' => $userId,
+                ':article_id' => $articleId,
+                ':category_id' => $categoryId
+            ]);
+            
+            // Если статья была прочитана впервые, обновляем интересы пользователя
+            if ($stmt->rowCount() > 0) {
+                $this->updateUserInterestsFromReads($userId);
+            }
+            
+            return $result;
+        } catch (PDOException $e) {
+            error_log("Ошибка при отметке статьи как прочитанной: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    // Получить статистику прочитанных статей пользователя
+    public function getReadStats($userId) {
+        $sql = "SELECT 
+                    COUNT(DISTINCT uar.article_id) as articles_read,
+                    COUNT(DISTINCT uar.category_id) as categories_read,
+                    (SELECT COUNT(*) FROM user_interests WHERE user_id = :user_id2) as following
+                FROM user_article_reads uar 
+                WHERE uar.user_id = :user_id";
+        
+        $result = $this->db->query($sql, ['user_id' => $userId, 'user_id2' => $userId]);
+        return !empty($result) ? $result[0] : ['articles_read' => 0, 'categories_read' => 0, 'following' => 0];
+    }
+
+    // Обновить интересы пользователя на основе прочитанных статей
+    private function updateUserInterestsFromReads($userId) {
+        // Получаем топ-5 категорий по количеству прочитанных статей
+        $sql = "SELECT category_id, COUNT(*) as read_count 
+                FROM user_article_reads 
+                WHERE user_id = :user_id 
+                GROUP BY category_id 
+                ORDER BY read_count DESC 
+                LIMIT 5";
+        
+        $topCategories = $this->db->query($sql, ['user_id' => $userId]);
+        
+        if (!empty($topCategories)) {
+            // Очищаем старые интересы
+            $this->db->execute("DELETE FROM user_interests WHERE user_id = :user_id", ['user_id' => $userId]);
+            
+            // Добавляем новые интересы
+            foreach ($topCategories as $category) {
+                $this->db->execute(
+                    "INSERT INTO user_interests (user_id, category_id, weight) VALUES (:user_id, :category_id, :weight)",
+                    [
+                        ':user_id' => $userId,
+                        ':category_id' => $category['category_id'],
+                        ':weight' => $category['read_count']
+                    ]
+                );
+            }
+        }
+    }
+
+    // Проверить, прочитал ли пользователь статью
+    public function hasReadArticle($userId, $articleId) {
+        $sql = "SELECT id FROM user_article_reads WHERE user_id = :user_id AND article_id = :article_id LIMIT 1";
+        $result = $this->db->query($sql, ['user_id' => $userId, 'article_id' => $articleId]);
+        return !empty($result);
+    }
+
+    // Получить интересы пользователя из таблицы user_interests
+    public function getUserInterests($userId) {
+        $sql = "SELECT c.name, c.slug, ui.weight 
+                FROM user_interests ui 
+                JOIN categories c ON ui.category_id = c.id 
+                WHERE ui.user_id = :user_id 
+                ORDER BY ui.weight DESC";
+        return $this->db->query($sql, ['user_id' => $userId]);
+    }
 }

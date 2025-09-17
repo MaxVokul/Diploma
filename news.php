@@ -24,6 +24,12 @@ if (!$newsItem) {
 // Инкремент просмотров
 $newsModel->incrementViews($newsId);
 
+// Отметить статью как прочитанную, если пользователь авторизован
+if (isset($_SESSION['user_id'])) {
+    $userModel = new UserModel();
+    $userModel->markArticleAsRead($_SESSION['user_id'], $newsId, $newsItem['category_id']);
+}
+
 include __DIR__ . '/header.php';
 ?>
 
