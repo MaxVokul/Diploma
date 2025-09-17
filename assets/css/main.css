@@ -1029,8 +1029,12 @@ footer .contacts{
     color: var(--primary);
 }
 .admin-main {
+    background-color: white;
     flex: 1;
     padding: 20px;
+}
+.admin-link{
+    margin: 0 2dvh 0 0;
 }
 .admin-stats {
     display: flex;
@@ -1086,7 +1090,7 @@ tr:nth-child(even) { background-color: #f9f9f9; }
 .btn-create { display: inline-block; padding: 10px 15px; background-color: var(--primary); color: white; text-decoration: none; border-radius: 5px; margin-bottom: 20px; }
 .btn-create:hover { background-color: #a090c0; }
 
-/* --- Merged mobile.css --- */
+/* --- Mobile.css --- */
 @media (max-width: 570px) {
     body { font-size: 14px; }
     .header { padding: 0.5dvh 1dvw; }
