@@ -18,6 +18,7 @@ $newsModel = new NewsModel();
 
 // Получаем последние новости для главной страницы
 $topStories = $newsModel->getLatest(3);
+$topStoryIds = array_map(function($s){ return (int)$s['id']; }, $topStories);
 $forYouNews = [];
 $forYouHeadline = 'For You';
 $forYouSubtitle = 'Recommended based on your interests';
@@ -29,17 +30,12 @@ if (isset($_SESSION['user_id'])) {
     $interests = $userModelTmp->getUserInterests($_SESSION['user_id']);
     if (!empty($interests) && !empty($interests[0]['category_id'])) {
         $topCategoryId = (int)$interests[0]['category_id'];
-        $forYouNews = $newsModel->getByCategory($topCategoryId, 12);
-        // Если в топ-категории новостей мало — дозаполним последними общими
-        if (count($forYouNews) < 12) {
-            $more = $newsModel->getLatest(12 - count($forYouNews));
-            $forYouNews = array_merge($forYouNews, $more);
-        }
+        $forYouNews = $newsModel->getByCategory($topCategoryId, 20);
         $forYouHeadline = 'For You';
         $forYouSubtitle = 'Recommended based on your interests';
     } else {
         // Новый пользователь: показываем "What's new?" со случайной подборкой из последних
-        $recentPool = $newsModel->getLatest(50);
+        $recentPool = $newsModel->getLatest(80);
         shuffle($recentPool);
         $forYouNews = array_slice($recentPool, 0, 12);
         $forYouHeadline = "What's new?";
@@ -47,12 +43,41 @@ if (isset($_SESSION['user_id'])) {
     }
 } else {
     // Не авторизован: показываем "What's new?" со случайной подборкой из последних
-    $recentPool = $newsModel->getLatest(50);
+    $recentPool = $newsModel->getLatest(80);
     shuffle($recentPool);
     $forYouNews = array_slice($recentPool, 0, 12);
     $forYouHeadline = "What's new?";
     $forYouSubtitle = '';
 }
+
+// Удаляем дубликаты с Top stories и дополняем при необходимости
+$desiredCount = 12;
+$pickedIds = $topStoryIds;
+$uniqueForYou = [];
+foreach ($forYouNews as $item) {
+    $id = (int)$item['id'];
+    if (!in_array($id, $pickedIds, true)) {
+        $uniqueForYou[] = $item;
+        $pickedIds[] = $id;
+        if (count($uniqueForYou) >= $desiredCount) break;
+    }
+}
+
+if (count($uniqueForYou) < $desiredCount) {
+    // Пополняем из последних новостей случайным образом, исключая уже выбранные и топ-сториз
+    $pool = $newsModel->getLatest(100);
+    shuffle($pool);
+    foreach ($pool as $cand) {
+        $id = (int)$cand['id'];
+        if (!in_array($id, $pickedIds, true)) {
+            $uniqueForYou[] = $cand;
+            $pickedIds[] = $id;
+            if (count($uniqueForYou) >= $desiredCount) break;
+        }
+    }
+}
+
+$forYouNews = $uniqueForYou;
 
 // Получаем все категории
 $categories = $newsModel->getAllCategories();
@@ -96,14 +121,16 @@ include 'header.php';
                     <?php for ($j = 0; $j < 3 && ($i + $j) < count($forYouNews); $j++): ?>
                         <?php $newsItem = $forYouNews[$i + $j]; ?>
                         <div class="rect">
-                            <img src="<?php echo htmlspecialchars($newsItem['image_url'] ?? 'resources/Rectangle 20.png'); ?>" class="rectimg" alt="<?php echo htmlspecialchars($newsItem['title']); ?>">
-                            <div class="recttxt">
-                                <h2><?php echo htmlspecialchars($newsItem['title']); ?></h2>
-                                <p><?php echo htmlspecialchars(substr($newsItem['excerpt'], 0, 150)) . (strlen($newsItem['excerpt']) > 150 ? '...' : ''); ?></p>
-                            </div>
-                            <p class="rectp">
-                                <?php echo date('H:i', strtotime($newsItem['published_at'])); ?> ago / by <?php echo htmlspecialchars($newsItem['author_name']); ?>
-                            </p>
+                            <a href="/news.php?id=<?php echo (int)$newsItem['id']; ?>" class="rectlink">
+                                <img src="<?php echo htmlspecialchars($newsItem['image_url'] ?? 'resources/Rectangle 20.png'); ?>" class="rectimg" alt="<?php echo htmlspecialchars($newsItem['title']); ?>">
+                                <div class="recttxt">
+                                    <h2><?php echo htmlspecialchars($newsItem['title']); ?></h2>
+                                    <p><?php echo htmlspecialchars(substr($newsItem['excerpt'], 0, 150)) . (strlen($newsItem['excerpt']) > 150 ? '...' : ''); ?></p>
+                                </div>
+                                <p class="rectp">
+                                    <?php echo date('H:i', strtotime($newsItem['published_at'])); ?> ago / by <?php echo htmlspecialchars($newsItem['author_name']); ?>
+                                </p>
+                            </a>
                         </div>
                     <?php endfor; ?>
                 </div>
