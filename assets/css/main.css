@@ -1083,19 +1083,6 @@ footer .contacts{
         max-width: 100%;
     }
 }
-
-/* Interest tags with weight */
-.interest-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.interest-weight {
-    font-size: 0.8em;
-    opacity: 0.7;
-    font-weight: normal;
-}
 .admin-stats {
     display: flex;
     gap: 20px;
