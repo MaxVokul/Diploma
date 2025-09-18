@@ -19,12 +19,39 @@ $newsModel = new NewsModel();
 // Получаем последние новости для главной страницы
 $topStories = $newsModel->getLatest(3);
 $forYouNews = [];
+$forYouHeadline = 'For You';
+$forYouSubtitle = 'Recommended based on your interests';
 
-// Если пользователь авторизован — показываем персонализированные новости
+// Секции "For You" / "What's new?"
 if (isset($_SESSION['user_id'])) {
-    $forYouNews = $newsModel->getRecommendedForUser($_SESSION['user_id'], 12);
+    // Пробуем выбрать самую просматриваемую пользователем категорию
+    $userModelTmp = new UserModel();
+    $interests = $userModelTmp->getUserInterests($_SESSION['user_id']);
+    if (!empty($interests) && !empty($interests[0]['category_id'])) {
+        $topCategoryId = (int)$interests[0]['category_id'];
+        $forYouNews = $newsModel->getByCategory($topCategoryId, 12);
+        // Если в топ-категории новостей мало — дозаполним последними общими
+        if (count($forYouNews) < 12) {
+            $more = $newsModel->getLatest(12 - count($forYouNews));
+            $forYouNews = array_merge($forYouNews, $more);
+        }
+        $forYouHeadline = 'For You';
+        $forYouSubtitle = 'Recommended based on your interests';
+    } else {
+        // Новый пользователь: показываем "What's new?" со случайной подборкой из последних
+        $recentPool = $newsModel->getLatest(50);
+        shuffle($recentPool);
+        $forYouNews = array_slice($recentPool, 0, 12);
+        $forYouHeadline = "What's new?";
+        $forYouSubtitle = '';
+    }
 } else {
-    $forYouNews = $newsModel->getLatest(12);
+    // Не авторизован: показываем "What's new?" со случайной подборкой из последних
+    $recentPool = $newsModel->getLatest(50);
+    shuffle($recentPool);
+    $forYouNews = array_slice($recentPool, 0, 12);
+    $forYouHeadline = "What's new?";
+    $forYouSubtitle = '';
 }
 
 // Получаем все категории
@@ -54,8 +81,10 @@ include 'header.php';
 
     <section class="foryou">
         <div class="foryouh2">
-            <h2 id="fy">For You</h2>
-            <p>Recommended based on your interests</p>
+            <h2 id="fy"><?php echo htmlspecialchars($forYouHeadline); ?></h2>
+            <?php if (!empty($forYouSubtitle)): ?>
+                <p><?php echo htmlspecialchars($forYouSubtitle); ?></p>
+            <?php endif; ?>
         </div>
     </section>
 

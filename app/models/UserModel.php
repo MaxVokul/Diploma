@@ -205,7 +205,7 @@ class UserModel {
 
     // Получить интересы пользователя из таблицы user_interests
     public function getUserInterests($userId) {
-        $sql = "SELECT c.name, c.slug, ui.weight 
+        $sql = "SELECT ui.category_id, c.name, c.slug, ui.weight 
                 FROM user_interests ui 
                 JOIN categories c ON ui.category_id = c.id 
                 WHERE ui.user_id = :user_id 
