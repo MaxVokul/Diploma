@@ -211,4 +211,13 @@ class NewsModel {
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result ?: null; // Вернуть результат или null, если не найдено
     }
+
+    // Получить общее количество новостей в категории
+    public function getCategoryCount($categoryId) {
+        $sql = "SELECT COUNT(*) as total FROM news WHERE category_id = :category_id AND is_published = 1";
+        $stmt = $this->db->getConnection()->prepare($sql);
+        $stmt->execute([':category_id' => $categoryId]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return (int)$result['total'];
+    }
 }
