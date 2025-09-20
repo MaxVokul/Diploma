@@ -11,8 +11,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const totalItems = carouselTrack.children.length;
         // Calculate max position considering the 1500px limit
         const maxTransform = Math.max(0, totalItems * itemWidth - carouselTrack.parentElement.offsetWidth);
-        const limitedMaxTransform = Math.min(maxTransform, 1500);
-        const maxPosition = Math.floor(limitedMaxTransform / itemWidth);
+        const limitedMaxTransform = Math.min(maxTransform, 1800);
+        // Allow the carousel to reach the full 1500px limit by calculating max position based on 1500px
+        const maxPosition = Math.floor(1800 / itemWidth);
         
         function updateCarousel() {
             // Calculate the exact transform needed to show all items without empty spaces
@@ -57,7 +58,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const newVisibleItems = Math.floor(carouselTrack.parentElement.offsetWidth / itemWidth);
             const newMaxTransform = Math.max(0, totalItems * itemWidth - carouselTrack.parentElement.offsetWidth);
             const newLimitedMaxTransform = Math.min(newMaxTransform, 1500);
-            const newMaxPosition = Math.floor(newLimitedMaxTransform / itemWidth);
+            // Allow the carousel to reach the full 1500px limit by calculating max position based on 1500px
+            const newMaxPosition = Math.floor(1500 / itemWidth);
             if (currentPosition > newMaxPosition) {
                 currentPosition = newMaxPosition;
             }
@@ -77,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Total articles available:', allNews.length);
         
         let currentRows = 4; // Start with 4 rows
-        const loadMoreRows = 6; // Load 6 more rows each time
+        const loadMoreRows = 3; // Load 3 more rows each time
         const articlesPerRow = 3;
         
         // Update the counter text

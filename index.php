@@ -266,13 +266,8 @@ include 'header.php';
         <?php if (count($forYouNews) > 12): ?>
             <div class="load-more-container">
                 <button id="loadMoreBtn" class="btn btn-primary">Load More Articles</button>
-                <p style="margin-top: 10px; color: #666; font-size: 0.9rem;">
-                    Showing 12 of <?php echo count($forYouNews); ?> articles
-                </p>
-                <!-- Debug info -->
-                <p style="margin-top: 5px; color: #999; font-size: 0.8rem;">
-                    Debug: Total articles = <?php echo count($forYouNews); ?>, Should show button = <?php echo count($forYouNews) > 12 ? 'YES' : 'NO'; ?>
-                </p>
+
+
             </div>
         <?php else: ?>
             <div class="load-more-container" style="display: none;">

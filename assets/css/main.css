@@ -662,7 +662,6 @@ header{
     text-align: center;
     background-color: rgba(154, 140, 193, 0.05);
     border-radius: 15px;
-    border: 2px dashed var(--primary);
 }
 
 .load-more-container .btn {
