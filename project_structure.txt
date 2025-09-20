@@ -1369,44 +1369,878 @@ include 'header.php';
 
 FILE: header.php
 =====================================
-[COMPLETE FILE CONTENT - Contains 289 lines of HTML/PHP code with navigation, categories menu, and error display. Includes session management, category loading, error display, header structure, navigation menu, user authentication UI, modal windows, and sliding menu functionality.]
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
+// Инициализация автозагрузчика/базы
+require_once __DIR__ . '/app/core/Database.php';
+require_once __DIR__ . '/app/models/NewsModel.php';
+
+// Загружаем категории для меню
+$headerCategories = [];
+try {
+    $newsModelForHeader = new NewsModel();
+    $headerCategories = $newsModelForHeader->getAllCategories();
+} catch (Exception $e) {
+    $headerCategories = [];
+}
+
+?>
+<?php if (isset($_SESSION['registration_errors']) && !empty($_SESSION['registration_errors'])): ?>
+    <div style="position: fixed; top: 0; left: 0; right: 0; background: #f8d7da; color: #721c24; padding: 1rem; text-align: center; z-index: 9999;">
+        <?php foreach ($_SESSION['registration_errors'] as $error): ?>
+            <p style="margin: 0.3rem 0;"><?php echo htmlspecialchars($error); ?></p>
+        <?php endforeach; ?>
+    </div>
+    <?php unset($_SESSION['registration_errors']); ?>
+<?php endif; ?>
+
+<?php if (isset($_SESSION['login_errors']) && !empty($_SESSION['login_errors'])): ?>
+    <div style="position: fixed; top: 0; left: 0; right: 0; background: #f8d7da; color: #721c24; padding: 1rem; text-align: center; z-index: 9999;">
+        <?php foreach ($_SESSION['login_errors'] as $error): ?>
+            <p style="margin: 0.3rem 0;"><?php echo htmlspecialchars($error); ?></p>
+        <?php endforeach; ?>
+    </div>
+    <?php unset($_SESSION['login_errors']); ?>
+<?php endif; ?>
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Aclonica&display=swap" rel="stylesheet">
+
+    <title>NEWS</title>
+</head>
+<body>
+
+<header class="header">
+    <div class="logoholder">
+        <a href="#">
+            <img class="hamburger" src="/resources/Hamburger_icon1.png" alt="Menu">
+        </a>
+        <a href="/index.php">
+            <div class="mains">NEWS</div>
+        </a>
+    </div>
+    <ol id="menu" class="ol1">
+        <li><a class="li1" href="">
+                <svg width="98" height="98" viewBox="0 0 98 98" fill="none" xmlns="http://www.w3.org/2000/svg"
+                     xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <g filter="url(#filter0_d_123_52)">
+                        <rect x="4" width="90" height="90" fill="url(#pattern0_123_52)" shape-rendering="crispEdges"/>
+                    </g>
+                    <defs>
+                        <filter id="filter0_d_123_52" x="0" y="0" width="98" height="98" filterUnits="userSpaceOnUse"
+                                color-interpolation-filters="sRGB">
+                            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                                           result="hardAlpha"/>
+                            <feOffset dy="4"/>
+                            <feGaussianBlur stdDeviation="2"/>
+                            <feComposite in2="hardAlpha" operator="out"/>
+                            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+                            <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_123_52"/>
+                            <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_123_52" result="shape"/>
+                        </filter>
+                        <pattern id="pattern0_123_52" patternContentUnits="objectBoundingBox" width="1" height="1">
+                            <use xlink:href="#image0_123_52" transform="scale(0.0111111)"/>
+                        </pattern>
+                        <image id="image0_123_52" width="90" height="90"
+                               xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFoAAABaCAYAAAA4qEECAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAv0lEQVR4nO3awWrCQABF0Ys7/XxrqV9pu2m3kUDWYmahAz0H8gOXMAN5KQAAAAAAAADe6lR9Vj/V4ulRg+/qUh1HQl/Fbe8Ltjbb5VD9Cd3e0L9bO6GbLLSjo6HQXw1YD/aP7aB3Gfawwa06j16GAAAAAAD/nHG2p7/DG2d77WhhnO01oY2zTRp65b+OjLPLZIOxcRYAAAAAYJxxNuPsMsHHfuNs7wttnG3S0CvjbMbZZYLz2DgLAAAAAAAA0GTuqD9gUMDt6+cAAAAASUVORK5CYII="/>
+                    </defs>
+                </svg>
+            </a>
+            <ol class="ol2">
+                <li>
+                    <a href="/index.php">Home</a>
+                </li>
+                <li>
+                    <a href="#">For you</a>
+                </li>
+                <li>
+                    <a href="#">Following</a>
+                </li>
+                <li>
+                    <a href="#">World</a>
+                </li>
+                <li>
+                    <a href="/aboutus.html">About us</a>
+                </li>
+            </ol>
+        </li>
+    </ol>
+    <div class="nav">
+        <ul><li>
+                <a href="/index.php">
+                    <h3>Home</h3>
+                </a>
+                </a></li>
+            <li><a href="#fy"><h3>For you</h3></a></li>
+            <li><h3>Following</h3></li>
+            <li><h3>World</h3></li>
+            <a href="/aboutus.html">
+                <li id="right"><h3>About us</h3></li>
+            </a>
+        </ul>
+    </div>
+    <div class="rightpanel">
+        <input id="mobsearch" class="rpl" type="text" placeholder="Search">
+        <svg class="rpl" width="51" height="44" viewBox="0 0 51 44" fill="none"
+             xmlns="http://www.w3.org/2000/svg">
+            <path d="M12.75 0C9.24375 0 6.12 1.46625 3.76125 3.76125C1.46625 6.05625 0 9.18 0 12.75C0 16.2563 1.46625 19.38 3.76125 21.7388L25.5 43.4775L47.2388 21.7388C49.5337 19.4438 51 16.32 51 12.75C51 9.24375 49.5337 6.12 47.2388 3.76125C44.9437 1.46625 41.82 0 38.25 0C34.7438 0 31.62 1.46625 29.2613 3.76125C26.9663 6.05625 25.5 9.18 25.5 12.75C25.5 9.24375 24.0338 6.12 21.7388 3.76125C19.4438 1.46625 16.32 0 12.75 0Z"
+                  fill="black"/>
+        </svg>
+        <?php if (isset($_SESSION['user_id'])): ?>
+            <?php
+            // Подключаем модель пользователя для проверки прав админа
+            require_once 'app/models/UserModel.php';
+            $userModelHeaderCheck = new UserModel();
+            $isAdmin = $userModelHeaderCheck->isAdmin($_SESSION['user_id']);
+            ?>
+            <a href="/profile.php" class="btn--show-modal-window profile-link" title="Профиль">
+                <svg class="rpl" width="52" height="46" viewBox="0 0 52 46" fill="none"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19.307 0V6.43568H45.0497V38.6141H19.307V45.0497H51.4854V0H19.307ZM25.7427 12.8714V19.307H0V25.7427H25.7427V32.1784L38.6141 22.5249L25.7427 12.8714Z"
+                          fill="black"/>
+                </svg>
+            </a>
+            <?php if ($isAdmin): ?>
+                <a href="/admin/" class="admin-link" title="Админ-панель">
+                    <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+                         width="25.000000pt" height="25.000000pt" viewBox="0 0 1182.000000 1280.000000"
+                         preserveAspectRatio="xMidYMid meet">
+                        <g transform="translate(0.000000,1280.000000) scale(0.100000,-0.100000)"
+                           fill="#000000" stroke="none">
+                            <path d="M3480 12794 c-211 -36 -277 -85 -330 -244 -29 -87 -36 -271 -21 -518
+                                20 -302 19 -303 -247 -361 -66 -15 -151 -47 -295 -112 -198 -90 -323 -139
+                                -351 -139 -8 0 -67 62 -132 138 -390 456 -569 527 -818 325 -32 -27 -132 -129
+                                -222 -227 -200 -219 -237 -281 -237 -400 0 -140 75 -250 354 -519 l170 -164
+                                -60 -94 c-113 -174 -229 -434 -306 -691 -17 -55 -36 -95 -52 -110 l-25 -23
+                                -306 -1 c-253 0 -315 -3 -354 -16 -147 -49 -212 -135 -238 -317 -15 -100 -7
+                                -511 11 -586 30 -128 92 -211 190 -257 102 -48 143 -53 468 -53 l303 0 24 -83
+                                c61 -211 205 -515 309 -654 100 -132 110 -109 -169 -383 -319 -314 -341 -344
+                                -341 -485 0 -76 3 -90 30 -137 51 -88 151 -207 284 -335 200 -195 304 -260
+                                410 -259 134 0 237 69 444 296 56 61 156 168 223 238 l122 128 99 -49 c177
+                                -89 407 -170 650 -232 22 -6 51 -18 63 -28 l22 -17 -11 -222 c-29 -589 -11
+                                -729 103 -830 62 -55 147 -81 303 -94 137 -11 454 2 551 23 168 36 262 177
+                                281 420 9 103 1 326 -20 576 -10 122 -9 135 7 153 10 11 74 37 148 60 204 63
+                                308 104 485 190 l165 80 45 -53 c105 -120 353 -388 417 -449 181 -173 343
+                                -218 495 -138 62 33 285 228 397 347 199 211 229 351 115 532 -41 65 -228 251
+                                -405 404 -70 61 -132 122 -139 138 -16 39 -6 68 70 198 112 194 178 335 235
+                                508 16 45 39 96 52 111 56 67 154 80 429 56 307 -26 428 -8 521 77 86 79 116
+                                218 116 543 -1 224 -15 329 -58 424 -14 33 -38 70 -52 84 -41 40 -134 77 -230
+                                94 -87 15 -112 15 -507 -2 -186 -8 -207 9 -256 205 -34 136 -37 141 -157 370
+                                -44 85 -89 183 -98 217 -28 103 -21 115 167 287 177 164 266 268 313 366 27
+                                57 31 76 31 151 0 132 -33 191 -233 410 -245 268 -325 324 -463 324 -67 0 -83
+                                -4 -150 -37 -103 -52 -193 -133 -363 -323 -80 -90 -161 -175 -178 -188 -69
+                                -51 -111 -44 -262 47 -63 37 -132 68 -208 92 -62 19 -158 50 -212 67 -110 35
+                                -189 78 -219 119 -19 25 -19 33 -7 248 14 233 9 381 -14 467 -47 177 -138 267
+                                -299 298 -70 13 -525 28 -577 19z m465 -2700 c331 -54 621 -257 757 -529 75
+                                -150 102 -272 102 -465 1 -219 -33 -354 -133 -524 -140 -239 -406 -414 -726
+                                -477 -101 -20 -377 -18 -483 4 -389 80 -687 325 -792 653 -43 136 -53 217 -47
+                                394 4 128 9 170 31 243 97 325 339 562 681 665 199 61 388 72 610 36z"/>
+                                                            <path d="M7505 7440 c-22 -5 -107 -20 -190 -35 -412 -71 -533 -152 -551 -368
+                                -10 -119 11 -241 92 -525 49 -169 54 -230 25 -279 -19 -31 -46 -46 -213 -121
+                                -37 -17 -146 -89 -245 -163 -210 -157 -289 -209 -315 -209 -10 0 -81 47 -157
+                                104 -315 238 -448 306 -599 306 -104 0 -199 -60 -287 -184 -60 -85 -222 -357
+                                -261 -441 -65 -135 -60 -259 13 -363 54 -78 166 -165 393 -307 106 -66 197
+                                -123 202 -126 6 -4 -4 -46 -26 -104 -76 -202 -123 -419 -150 -694 -16 -162
+                                -26 -185 -91 -208 -22 -8 -123 -29 -225 -48 -290 -55 -377 -84 -453 -154 -106
+                                -98 -119 -241 -51 -531 14 -58 34 -143 45 -190 30 -125 87 -238 149 -293 72
+                                -65 129 -82 265 -81 114 2 189 15 495 88 79 19 145 34 146 33 140 -270 332
+                                -523 522 -687 84 -73 89 -56 -139 -397 -152 -226 -197 -305 -219 -386 -16 -60
+                                -8 -151 18 -203 67 -130 443 -395 689 -484 107 -39 203 -19 305 61 57 45 138
+                                160 252 356 85 146 219 366 232 382 2 2 38 -6 81 -17 189 -51 380 -79 606 -91
+                                200 -10 201 -11 211 -109 11 -104 104 -599 127 -677 42 -139 96 -217 183 -263
+                                47 -25 60 -27 171 -26 139 0 256 22 494 90 180 52 219 70 277 130 69 72 88
+                                133 88 289 -1 116 -4 146 -37 275 -20 80 -60 222 -88 315 -28 94 -53 182 -56
+                                196 -6 34 25 60 154 129 127 69 326 201 431 287 46 37 94 77 107 87 l24 19
+                                213 -154 c355 -255 434 -302 566 -334 128 -31 238 2 333 102 55 57 269 367
+                                316 458 108 210 98 332 -39 469 -73 72 -173 139 -383 256 -231 128 -261 147
+                                -273 175 -17 37 -16 42 23 157 65 189 104 357 130 558 17 131 31 166 77 200
+                                58 43 131 61 379 95 98 13 198 29 221 35 183 48 271 120 299 247 35 154 -67
+                                649 -169 823 -104 177 -274 194 -721 69 -284 -79 -309 -73 -397 103 -66 133
+                                -98 179 -214 313 -116 132 -167 208 -186 271 -19 67 -15 76 115 259 206 288
+                                268 435 241 575 -23 123 -97 204 -340 374 -243 169 -338 216 -446 216 -165 0
+                                -278 -112 -494 -492 -129 -226 -150 -248 -228 -248 -25 0 -99 17 -166 39 -108
+                                35 -142 41 -311 55 -237 20 -316 37 -361 80 -33 30 -34 34 -60 206 -53 364
+                                -99 502 -201 611 -67 72 -133 101 -241 105 -48 2 -105 -1 -127 -6z m821 -2656
+                                c219 -39 408 -142 556 -303 174 -191 269 -473 255 -756 -7 -128 -32 -233 -81
+                                -339 -149 -324 -495 -562 -893 -616 -127 -17 -364 -8 -463 19 -313 83 -528
+                                259 -656 537 -96 206 -124 501 -68 708 52 192 183 384 346 509 285 217 649
+                                305 1004 241z"/>
+                        </g>
+                    </svg>
+                </a>
+            <?php endif; ?>
+        <?php else: ?>
+            <a href="#" class="btn--show-modal-window profile-link">
+                <svg class="rpl" width="52" height="46" viewBox="0 0 52 46" fill="none"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19.307 0V6.43568H45.0497V38.6141H19.307V45.0497H51.4854V0H19.307ZM25.7427 12.8714V19.307H0V25.7427H25.7427V32.1784L38.6141 22.5249L25.7427 12.8714Z"
+                          fill="black"/>
+                </svg>
+            </a>
+        <?php endif; ?>
+    </div>
+</header>
+
+<?php if (isset($_SESSION['user_id'])): ?>
+    <div id="user-authenticated" style="display: none;"></div>
+<?php endif; ?>
+
+<!-- Modal window -->
+<div class="modal-window hidden">
+    <button class="btn--close-modal-window">×</button>
+    <!-- Toggle buttons -->
+    <div class="modal-toggle">
+        <button class="toggle-btn active" data-tab="login">Login</button>
+        <button class="toggle-btn" data-tab="register">Register</button>
+    </div>
+    <!-- Login Form -->
+    <form class="modal__form login-form" style="display: flex;" action="/login-process.php" method="POST">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" name="email" placeholder="Enter your email" required>
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" name="password" placeholder="Enter your password" required>
+        <button type="submit" class="btn">Login →</button>
+    </form>
+    <!-- Register Form -->
+    <form class="modal__form register-form" style="display: none;" action="/register-process.php" method="POST">
+        <label for="register-name">Full Name</label>
+        <input type="text" id="register-name" name="name" placeholder="Enter your full name" required>
+        <label for="register-email">Email</label>
+        <input type="email" id="register-email" name="email" placeholder="Enter your email" required>
+        <label for="register-phone">Phone Number</label>
+        <input type="tel" id="register-phone" name="phone" class="phone" placeholder="Enter your phone">
+        <label for="register-password">Password</label>
+        <input type="password" id="register-password" name="password" placeholder="Create password" required>
+        <label for="register-confirm-password">Confirm Password</label>
+        <input type="password" id="register-confirm-password" name="confirm_password" placeholder="Confirm password" required>
+        <button type="submit" class="btn">Register →</button>
+    </form>
+</div>
+<div class="overlay hidden"></div>
+
+<!-- Sliding Left Menu -->
+<div class="slide-menu hidden">
+    <div class="slide-menu__content">
+        <button class="btn--close-slide-menu">×</button>
+        <nav class="slide-nav">
+            <ul>
+                <?php if (!empty($headerCategories)): ?>
+                    <?php foreach ($headerCategories as $cat): ?>
+                        <li>
+                            <a href="/category.php?category=<?php echo htmlspecialchars($cat['slug']); ?>">
+                                <?php echo htmlspecialchars($cat['name']); ?>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <li><a href="#">No categories</a></li>
+                <?php endif; ?>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<!-- Overlay for blur -->
+<div class="slide-overlay hidden"></div>
+
+<main>
 =====================================
 
 FILE: footer.php
 =====================================
-[COMPLETE FILE CONTENT - Contains 70 lines of HTML with social media icons and footer content. Includes closing main tag, footer section with social media SVG icons (Facebook, Google Plus, Instagram, Reddit, Twitter), and script includes for all JavaScript files (script.js, phone.js, slidingmenu.js, carousel.js, index.js).]
+</main>
 
+<footer>
+    <div class="contacts">
+        <svg class="rpl" width="68" height="68" viewBox="0 0 68 68" fill="none" xmlns="http://www.w3.org/2000/svg"
+             xmlns:xlink="http://www.w3.org/1999/xlink">
+            <rect width="68" height="68" fill="url(#pattern0_31_337)"/>
+            <defs>
+                <pattern id="pattern0_31_337" patternContentUnits="objectBoundingBox" width="1" height="1">
+                    <use xlink:href="#image0_31_337" transform="scale(0.0111111)"/>
+                </pattern>
+                <image id="image0_31_337" width="90" height="90"
+                       xlink:href="data:image/png;base64,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"/>
+            </defs>
+        </svg>
+        <svg class="rpl" width="68" height="68" viewBox="0 0 68 68" fill="none" xmlns="http://www.w3.org/2000/svg"
+             xmlns:xlink="http://www.w3.org/1999/xlink">
+            <rect width="68" height="68" fill="url(#pattern0_31_335)"/>
+            <defs>
+                <pattern id="pattern0_31_335" patternContentUnits="objectBoundingBox" width="1" height="1">
+                    <use xlink:href="#image0_31_335" transform="scale(0.0111111)"/>
+                </pattern>
+                <image id="image0_31_335" width="90" height="90"
+                       xlink:href="data:image/png;base64,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"/>
+            </defs>
+        </svg>
+        <svg class="rpl" width="68" height="68" viewBox="0 0 68 68" fill="none" xmlns="http://www.w3.org/2000/svg"
+             xmlns:xlink="http://www.w3.org/1999/xlink">
+            <rect width="68" height="68" fill="url(#pattern0_31_336)"/>
+            <defs>
+                <pattern id="pattern0_31_336" patternContentUnits="objectBoundingBox" width="1" height="1">
+                    <use xlink:href="#image0_31_336" transform="scale(0.0111111)"/>
+                </pattern>
+                <image id="image0_31_336" width="90" height="90"
+                       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFoAAABaCAYAAAA4qEECAAAACXBIWXMAAAsTAAALEwEAmpwYAAADsElEQVR4nO2c3UpVQRTHfxapPUAqZV+Q3lQ3ESVFUlnv0McrmF5YGSHRZWW3ReYjJBHUtZVWpkSWF9YjSJ+GkRXqjoFVRDh776Mzs3dn1g8WHA77/GfN33HN7NnDBkVRFEVRFEVRFEVRFMVQD3QD48BXIKnS+Ao8B7qAutB/+mbgdQlMSALHK+l7sJEco8nJX2YHGdndJehsUnCcCWH0eAk6mhQcYyGMnitBR5OCw3jgHVvj1UpSVH/VaNRoH+iIDoQaHQg1OhBqdCAT1WgHqNGBUKOBtcARoA8YAt4AM8C8xIx8NyTXHJbfqNE52Q0MAu9XcGtsfjMA7MzZVpQjehfwAFhysBdhNO7nMDwqo9cD/cBPD5s/RvOK7KGXpb+FNLwZmPBg8L/xEthegv4W0vBe4EMAk/+u33sK7G8hDe8FPucwZwEYAXqANqABWCfRIN+dBUbl2iy9jysw+781emuOFcU34KqYmRdz7TVZ+qVpv5OSFaq/K2Y1DdcDLzKMuFOhEf+yBbib0cZEBRNk6Yx2sSS7DNQ4yNFo9AKLHvP1jo+kF4ETHnI95WhdXjVGX/SY7yU1mj81Oatc7AduAFPArBzTMvsct4HjGb+tyVGzq35Ef8s58fVm6DwGWjMmyPmYjb6as82NObQ+Ae0pGv2xGr1QwTo5j9G/zW6xaDQ6XoV4x1WiIxW0eaEC3YcpOk9iNLrHor9PavJGCfP5R4XaHRbtczEa3WbRv+lA22z+L8fBGI3eYNGfcqBtln62Oh2d0bUW/VmPpz3NAXI12uGx4C8sT5RGN1j03zrQnrZoR1k62iz6gw60b1m0o5wMeyz6xxxoH7VoR7m8G01pY3gVuo9SdJ/FaPRCSp1uldvpSjXNM8EdFs2mWG/BE3nGZ6O9QrONyYdS9K47zt07LpOdly1MGy2yd5GlM5wykg3bgO8xG53IpnzWxn+H3FZPyzp7Tj4PpEx8vzHa9zzk7Z3EQ/R5zPeyp5y94yPpJeCkh1xP68NZljXbHEhc48BgPW5AvpqdNkHmOQnloyZXRelIllmN9MveRF6aZAnnenVR1UYnEovy+MncOh8Q42tlF65R9i7OA089n0qqeqOTEocajRpN0aNQRzTFG6elg+JN1RqNGl34iEt0RFO4SVo6KN7A0tRofR0b1nMjTtEXDBLmBYNdJfi3TQqOzhBG18mLUJNIYzLl3KBzmiM1exLYRGDq5K2zY1U+Qc7JwZvOkCNZURRFURRFURRFURSFEvMLh6E3hzWYIp0AAAAASUVORK5CYII="/>
+            </defs>
+        </svg>
+        <svg class="rpl" width="68" height="68" viewBox="0 0 68 68" fill="none" xmlns="http://www.w3.org/2000/svg"
+             xmlns:xlink="http://www.w3.org/1999/xlink">
+            <rect width="68" height="68" fill="url(#pattern0_31_339)"/>
+            <defs>
+                <pattern id="pattern0_31_339" patternContentUnits="objectBoundingBox" width="1" height="1">
+                    <use xlink:href="#image0_31_339" transform="scale(0.0111111)"/>
+                </pattern>
+                <image id="image0_31_339" width="90" height="90"
+                       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFoAAABaCAYAAAA4qEECAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFbElEQVR4nO2dS2xVRRjHf02rxeAjEU3EAmrQaLpSsSFEjWjQJeJCjRQWWtEQqKgE3bpEVqaRxERx5QMXAkoiCHGtMRgsLHyCG1GRtqJVaaXtmCFfE3Jzzj1z7pnXuZ1f8m3a85jzv3Nn5nvMuZBIJBKJRCKRSCQSCWM6gT5gANgB7AOOASeAMWBSbEz+dkyOeVXOuUuukchgEfA8sB/4E1AV7SzwMbAF6GGOcxmwHjgMTFsQN8+mgEPAOmAec4jLpaedcihunv0OvAJcRRtzCbANGA0gcKPpNmyVNrUV9wLHIxC40b4FVtEG6DFxJzATgah5pts2BHRTU24EvohASGVoXwE3UzNWWVqmKc+ml4UPUBMeAc5FIJpq0bQz9DiR84zjNbHyZPoZNhApa8Q5CC2Ssij2Y0SGHtcmIhBHORhGHiISbqnpxKdKTJBLQ4vcLcsi1eZ2JPQ6e2cEIihPpp2aYG51zB6fsmz6We/zLXIXMBzBwyvPdtx3IGqbhUb/ALwOPAHcAVwtD6E/xAXA7fI/fczJCESetRd8iXxFhVDneeAdYEUL99XnvC/XCCn0GYmpO+elFht4QJaCVemVjElIsXUs23n66beSjfpHkqY26QBeDti7f3GdFltfskGngTsdtuf+gGL3O3yuC4nUMiLf6rAtnTLehxo+DrosCZguMVyY9OQlwKA0WqeV/hbT9RqfSBJXH9OIXpl8EFBkJQG0hQ50vlB3YdqIAYMPbZdhtO8/4G1gsZx7KfBhYJFnbbMLofeXWF0UhVPHW3ioUQlbfhSBwLO217bIXRLFKrrx+YIl3JbIEgN5mJ4/Zrv8rM/wxnpyataTpyMQ16bQ2pbZFHrA8KYrmozJ4xEI60LoJ20KvcMwdpHHrghEdSX0dptCm0xAOjadxZKIc4k2hLY6IZqERHWkLYtBSw/vwoPNo0x7j2KRnwxuqMOaWRwIIPQyB9ckp706hGuNEQOBdAw5i+8CCH2tR6F12NQakwYCaY8ti/EAQnd7FFqXWVgjCe1J6DR0eBo6TCZDnfezMRmqEqZ3Y7XVZGiyvFubc+7mANGzdRXng2DLu30VHJbFjhyWiSbx4Dc8Cr0Hzy74j5LLy+ItB0Lra2bRYTjURemCVw0q9QB/WRR5pElvvqfEdfIIFlQyDZO+2+Qaqy2FSadlV0Eeuz0LbTX53GkY+J8qSMg+V1HsmYJK/N6S80EewQL/yN5qk5t/WnCd1S0OIyMFPVnzmYVvTLCJ8OI0lGkDivZ/XA+8adj7JmXiK9o8v9GzyNo24YCeEl/Lf+V1DkUsksbq0oJvJC6iyw2+l2TwoBxTxPIAO8F0fvQ6HHGo5AZ3lwU0s9wmbrDv3lyU7a+Eqcd1sdh9DtuzXO6hAlieJ2ytyPHXkg06BzzroC0bA24cPeXj3R+tFqEflq95VXoDrC4a7UUiL0SfAt4D7m7irmfRIR7f7ghqQ/R8MB9PbLXQ4JMS/OkX72qBZGm0XSOhzn45xjR24cP0MtcbukTs6wgeWrX7ZiHkq5y2v3liKIJepjzZawSkW7bvqja3L5tk+b2x1DCyp2pqfwA3EQkra/7WGdUkoPUgkfFwxMWMqgXT6/VHiZQNETgUyoLpDvM0kbOm5sPIRIyv+Gn26p+zNZ34VlIzbgA+j0A8ZWhHYnilT5V19lDkHuSMOCPB18m23PXhCERttGGJJLYVXfJSkRBpp0Y7I1E43aa2Zb485M8BBD4tL+q+kjnEPIk3H3Ts6ExJInXtXHv1fBYLpQR3r1T/VBV3TK61yWVJQN3plIzLU1KpuUdqkE9ICm3250FG5W9H5ZjtUnCoz00/D5JIJBKJRCKRSCQSGPI/GfrX+sfqGR4AAAAASUVORK5CYII="/>
+            </defs>
+        </svg>
+        <svg class="rpl" width="68" height="68" viewBox="0 0 68 68" fill="none" xmlns="http://www.w3.org/2000/svg"
+             xmlns:xlink="http://www.w3.org/1999/xlink">
+            <rect width="68" height="68" fill="url(#pattern0_31_338)"/>
+            <defs>
+                <pattern id="pattern0_31_338" patternContentUnits="objectBoundingBox" width="1" height="1">
+                    <use xlink:href="#image0_31_338" transform="scale(0.0111111)"/>
+                </pattern>
+                <image id="image0_31_338" width="90" height="90"
+                       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFoAAABaCAYAAAA4qEECAAAACXBIWXMAAAsTAAALEwEAmpwYAAACNklEQVR4nO2csWpUQRSGv8rIggRtk8pGISBi5xuks/AVLE1SiY9gnVorQXwFO8UimkqtRHtbRQxo5ZELt0i3E3funNm73wen3J1zvvw7O3chAyIiIiIiIiIiMnAZOAJOgTMgZlpnwHvgENhq/affBT51ICEa18dx9mZJ3kTJcU52k2QfdTBsJNdBC9GnHQwayfWuhehfHQwayTU4mJzsIaOTUjSKJjuFJpp8cW4d5Et1j0bR6Yn7DjwHHgC3gR1gMR4VrgLXgOvAHrAPvDTRXFjwI+DKBc9fw2vcOiiT8AW4+Z8HXEVTJvkrsL3CU4SiWS75D3BnBcmKpizNxytKVjTLJf8Fbih6+mPc2wqSTTTLRT9RdJsHk3uFou8Cr8Zzdo11Jyc6q72Cnocnw9+V152c6Kx2Cnp+McG6kxOd1aKg58+KpkmyfiiaJqKn+CRNTvZWEYpWdFWyExwmeg33wXM866233tJaize99TZX0d96622Oohfjz61d9TZH0bd67G2Oou/32NscRT/usbc5in7aY29zFP1600VHpYHXMgTZYkPRiq5KdoLDRCu6KtkJDhOt6KpkJzhMtKKrkp3gMNGKrkp2gsNEK7oq2QkOE63oqmQnOEy0oquSneAw0YquSnaCw0QretbXsZVQe82fbOAFgyWs5QWDhx3IjWTRD2nA1ngR6qaK/gBcohG7Hckuoabkkn8grZ7sg3G/yvyCLGGV9x9mOxm3i2ZJFhERERERERGhY/4BzWMTzORFMuAAAAAASUVORK5CYII="/>
+            </defs>
+        </svg>
+    </div>
+</footer>
+
+<script defer src="assets/js/script.js"></script>
+<script defer src="assets/js/phone.js"></script>
+<script defer src="assets/js/slidingmenu.js"></script>
+<script defer src="assets/js/carousel.js"></script>
+<script defer src="assets/js/index.js"></script>
+
+</body>
+</html>
 =====================================
 
 FILE: category.php
 =====================================
-[COMPLETE FILE CONTENT - Contains 102 lines of PHP code with pagination logic for category pages. Includes session management, database connections, category validation, pagination settings (10 articles per page), category news retrieval, pagination UI with First/Previous/Next/Last buttons, and article display with proper formatting.]
+<?php
+// category.php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+require_once __DIR__ . '/app/core/Database.php';
+require_once __DIR__ . '/app/models/UserModel.php';
+require_once __DIR__ . '/app/models/NewsModel.php';
 
+$categorySlug = $_GET['category'] ?? '';
+
+if (empty($categorySlug)) {
+    http_response_code(404);
+    die('Категория не указана');
+}
+
+$newsModel = new NewsModel();
+$categoryInfo = $newsModel->getCategoryBySlug($categorySlug);
+
+if (!$categoryInfo) {
+    http_response_code(404);
+    die('Категория не найдена');
+}
+
+// Pagination settings
+$articlesPerPage = 10;
+$currentPage = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$offset = ($currentPage - 1) * $articlesPerPage;
+
+// Get total count and articles for current page
+$totalArticles = $newsModel->getCategoryCount($categoryInfo['id']);
+$totalPages = ceil($totalArticles / $articlesPerPage);
+$categoryNews = $newsModel->getByCategory($categoryInfo['id'], $articlesPerPage, $offset);
+
+include __DIR__ . '/header.php';
+?>
+
+<section class="tssection">
+    <h2 class="mains"><?php echo htmlspecialchars($categoryInfo['name']); ?></h2>
+    <p><?php echo htmlspecialchars($categoryInfo['description'] ?? ''); ?></p>
+
+    <?php if (empty($categoryNews)): ?>
+        <p>В этой категории пока нет новостей.</p>
+    <?php else: ?>
+        <?php foreach ($categoryNews as $newsItem): ?>
+            <a href="/news.php?id=<?php echo $newsItem['id']; ?>" class="tssqr">
+                <img class="imgts" src="<?php echo htmlspecialchars($newsItem['image_url'] ?? '/resources/image 1.png'); ?>" alt="<?php echo htmlspecialchars($newsItem['title']); ?>">
+                <div class="tstext">
+                    <h3><?php echo htmlspecialchars($newsItem['title']); ?></h3>
+                    <p><?php echo htmlspecialchars($newsItem['excerpt'] ?? substr(strip_tags($newsItem['content']), 0, 200) . '...'); ?></p>
+                    <p><?php echo date('d.m.Y H:i', strtotime($newsItem['published_at'])); ?> / by <?php echo htmlspecialchars($newsItem['author_name']); ?></p>
+                </div>
+            </a>
+        <?php endforeach; ?>
+    <?php endif; ?>
+</section>
+
+<?php if ($totalPages > 1): ?>
+    <div class="pagination-container">
+        <div class="pagination-info">
+            <p>Showing <?php echo count($categoryNews); ?> of <?php echo $totalArticles; ?> articles (Page <?php echo $currentPage; ?> of <?php echo $totalPages; ?>)</p>
+        </div>
+        
+        <div class="pagination">
+            <?php if ($currentPage > 1): ?>
+                <a href="?category=<?php echo urlencode($categorySlug); ?>&page=1" class="pagination-btn">« First</a>
+                <a href="?category=<?php echo urlencode($categorySlug); ?>&page=<?php echo $currentPage - 1; ?>" class="pagination-btn">‹ Previous</a>
+            <?php endif; ?>
+            
+            <?php
+            // Calculate page range to show
+            $startPage = max(1, $currentPage - 2);
+            $endPage = min($totalPages, $currentPage + 2);
+            
+            // Adjust range if we're near the beginning or end
+            if ($endPage - $startPage < 4) {
+                if ($startPage == 1) {
+                    $endPage = min($totalPages, $startPage + 4);
+                } else {
+                    $startPage = max(1, $endPage - 4);
+                }
+            }
+            
+            for ($i = $startPage; $i <= $endPage; $i++):
+            ?>
+                <a href="?category=<?php echo urlencode($categorySlug); ?>&page=<?php echo $i; ?>" 
+                   class="pagination-btn <?php echo $i == $currentPage ? 'active' : ''; ?>">
+                    <?php echo $i; ?>
+                </a>
+            <?php endfor; ?>
+            
+            <?php if ($currentPage < $totalPages): ?>
+                <a href="?category=<?php echo urlencode($categorySlug); ?>&page=<?php echo $currentPage + 1; ?>" class="pagination-btn">Next ›</a>
+                <a href="?category=<?php echo urlencode($categorySlug); ?>&page=<?php echo $totalPages; ?>" class="pagination-btn">Last »</a>
+            <?php endif; ?>
+        </div>
+    </div>
+<?php endif; ?>
+
+<button class="back-to-top" id="backToTop" title="Back to Top">↑</button>
+
+<?php include __DIR__ . '/footer.php'; ?>
 =====================================
 
 FILE: news.php
 =====================================
-[COMPLETE FILE CONTENT - Contains news article display logic with view tracking. Includes session management, database connections, news ID validation, full news retrieval, view increment tracking, user read tracking, and complete article display with title, date, author, image, content, and category information.]
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once __DIR__ . '/app/core/Database.php';
+require_once __DIR__ . '/app/models/NewsModel.php';
+require_once __DIR__ . '/app/models/UserModel.php';
+
+$newsId = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+if ($newsId <= 0) {
+    http_response_code(404);
+    die('Новость не найдена');
+}
+
+$newsModel = new NewsModel();
+$newsItem = $newsModel->getFullNews($newsId);
+
+if (!$newsItem) {
+    http_response_code(404);
+    die('Новость не найдена');
+}
+
+// Инкремент просмотров
+$newsModel->incrementViews($newsId);
+
+// Отметить статью как прочитанную, если пользователь авторизован
+if (isset($_SESSION['user_id'])) {
+    $userModel = new UserModel();
+    $userModel->markArticleAsRead($_SESSION['user_id'], $newsId, $newsItem['category_id']);
+}
+
+include __DIR__ . '/header.php';
+?>
+
+<section class="tssection">
+    <h2 class="mains"><?php echo htmlspecialchars($newsItem['title']); ?></h2>
+    <p><?php echo date('d.m.Y H:i', strtotime($newsItem['published_at'])); ?> / by <?php echo htmlspecialchars($newsItem['author_name'] ?? ''); ?></p>
+    <div class="news-cover">
+        <img class="imgts" src="<?php echo htmlspecialchars($newsItem['image_url'] ?? '/resources/image 1.png'); ?>" alt="<?php echo htmlspecialchars($newsItem['title']); ?>">
+    </div>
+    <article class="news-content">
+        <?php echo $newsItem['content']; ?>
+    </article>
+    <p>Category: <a href="/category.php?category=<?php echo htmlspecialchars($newsItem['category_slug'] ?? ''); ?>"><?php echo htmlspecialchars($newsItem['category_name'] ?? ''); ?></a></p>
+</section>
+
+<?php include __DIR__ . '/footer.php'; ?>
+
+
+
 
 =====================================
 
 FILE: login.php
 =====================================
-[COMPLETE FILE CONTENT - Contains user login form and authentication logic. Includes session management, user authentication check, form processing, email/password validation, user login verification, session creation, redirect handling, and complete login form UI with error/success messages.]
+<?php
+require_once 'header.php';
 
+// Проверяем, если пользователь уже авторизован
+if (isset($_SESSION['user_id'])) {
+    header('Location: /index.php');
+    exit();
+}
+
+$error = '';
+$success = '';
+
+// Обработка формы входа
+if ($_POST && isset($_POST['email']) && isset($_POST['password'])) {
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
+
+    if (empty($email) || empty($password)) {
+        $error = 'Please fill in all fields';
+    } else {
+        $userModel = new UserModel();
+        $user = $userModel->login($email, $password);
+
+        if ($user) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['email'] = $user['email'];
+
+            // Перенаправляем на предыдущую страницу или на главную
+            $redirect = $_SESSION['redirect_to'] ?? '/index.php';
+            unset($_SESSION['redirect_to']);
+            header("Location: $redirect");
+            exit();
+        } else {
+            $error = 'Invalid email or password';
+        }
+    }
+}
+?>
+
+    <div class="login-container">
+        <div class="login-form-wrapper">
+            <h1>Login to NEWS</h1>
+            <p>Welcome back! Please login to your account.</p>
+
+            <?php if ($error): ?>
+                <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
+            <?php endif; ?>
+
+            <!-- Login Form -->
+            <form class="login-form" method="POST">
+                <div class="form-group">
+                    <label for="login-email">Email or Phone</label>
+                    <input type="text" id="login-email" name="email" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>" required placeholder="Enter your email or phone">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" name="password" required placeholder="Enter your password">
+                </div>
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox" name="remember"> Remember me
+                    </label>
+                    <a href="#" class="btn--show-forgot-password">Forgot your password?</a>
+                </div>
+                <button type="submit" class="btn login-btn">Login</button>
+            </form>
+
+            <div class="register-link">
+                <p>Don't have an account? <a href="/register.php" class="toggle-to-register">Register now</a></p>
+            </div>
+        </div>
+    </div>
+
+<?php require_once 'footer.php'; ?>
 =====================================
 
 FILE: register.php
 =====================================
-[COMPLETE FILE CONTENT - Contains user registration form and validation logic. Includes session management, user authentication check, form processing, field validation (name, email, password, confirm password), password matching, length validation, user registration, automatic login after registration, and complete registration form UI with error/success messages.]
+<?php
+require_once 'header.php';
 
+// Проверяем, если пользователь уже авторизован
+if (isset($_SESSION['user_id'])) {
+    header('Location: /index.php');
+    exit();
+}
+
+$error = '';
+$success = '';
+
+// Обработка формы регистрации
+if ($_POST && isset($_POST['name']) && isset($_POST['email']) && isset($_POST['password']) && isset($_POST['confirm_password'])) {
+    $name = trim($_POST['name']);
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
+    $confirm_password = $_POST['confirm_password'];
+    $phone = trim($_POST['phone'] ?? '');
+
+    // Валидация
+    if (empty($name) || empty($email) || empty($password)) {
+        $error = 'Please fill in all required fields';
+    } elseif ($password !== $confirm_password) {
+        $error = 'Passwords do not match';
+    } elseif (strlen($password) < 6) {
+        $error = 'Password must be at least 6 characters long';
+    } else {
+        $userModel = new UserModel();
+        $userData = [
+            'username' => $name,
+            'email' => $email,
+            'phone' => $phone,
+            'password' => $password
+        ];
+
+        $userId = $userModel->register($userData);
+
+        if ($userId) {
+            $success = 'Registration successful! You can now log in.';
+
+            // Автоматически авторизуем пользователя
+            $user = $userModel->login($email, $password);
+            if ($user) {
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['email'] = $user['email'];
+                header("Location: /index.php");
+                exit();
+            }
+        } else {
+            $error = 'Email already exists';
+        }
+    }
+}
+?>
+
+    <div class="login-container">
+        <div class="login-form-wrapper">
+            <h1>Create Account</h1>
+            <p>Join our community to personalize your news experience.</p>
+
+            <?php if ($error): ?>
+                <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
+            <?php endif; ?>
+
+            <?php if ($success): ?>
+                <div class="success-message"><?php echo htmlspecialchars($success); ?></div>
+            <?php endif; ?>
+
+            <!-- Registration Form -->
+            <form class="login-form" method="POST">
+                <div class="form-group">
+                    <label for="register-name">Full Name</label>
+                    <input type="text" id="register-name" name="name" value="<?php echo htmlspecialchars($_POST['name'] ?? ''); ?>" required placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" name="email" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>" required placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="register-phone">Phone Number</label>
+                    <input type="tel" id="register-phone" name="phone" class="phone" value="<?php echo htmlspecialchars($_POST['phone'] ?? ''); ?>" placeholder="+1 (123) 456-7890">
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password</label>
+                    <input type="password" id="register-password" name="password" required placeholder="Create password">
+                </div>
+                <div class="form-group">
+                    <label for="register-confirm-password">Confirm Password</label>
+                    <input type="password" id="register-confirm-password" name="confirm_password" required placeholder="Confirm password">
+                </div>
+                <button type="submit" class="btn login-btn">Register</button>
+            </form>
+
+            <div class="register-link">
+                <p>Already have an account? <a href="/login.php" class="toggle-to-login">Login here</a></p>
+            </div>
+        </div>
+    </div>
+
+<?php require_once 'footer.php'; ?>
 =====================================
 
 FILE: profile.php
 =====================================
-[COMPLETE FILE CONTENT - Contains user profile management and preferences. Includes session management, user authentication check, user data retrieval, preferences loading, interests tracking, statistics display, profile settings (password change, profile update, notifications, privacy), interests management, category preferences, and complete profile UI with user avatar, stats, settings forms, and logout functionality.]
+<?php
+session_start();
 
+require_once 'header.php';
+require_once 'app/core/Database.php';
+require_once 'app/models/UserModel.php';
+require_once 'app/models/NewsModel.php';
+
+// Проверяем, что пользователь авторизован
+if (!isset($_SESSION['user_id'])) {
+    header('Location: /login.php');
+    exit();
+}
+
+// Получаем данные пользователя
+$userModel = new UserModel();
+$userData = $userModel->findById($_SESSION['user_id']);
+
+// Получаем предпочтения пользователя
+$preferences = $userModel->getPreferences($_SESSION['user_id']);
+
+// Получаем интересы пользователя из таблицы user_interests
+$userInterests = $userModel->getUserInterests($_SESSION['user_id']);
+
+// Сообщения (флеш)
+$flash_success = $_SESSION['profile_success'] ?? '';
+$flash_error = $_SESSION['profile_error'] ?? '';
+unset($_SESSION['profile_success'], $_SESSION['profile_error']);
+
+// Получаем реальную статистику пользователя
+$stats = $userModel->getReadStats($_SESSION['user_id']);
+$stats['comments_posted'] = 0; // Пока нет системы комментариев
+
+// Получаем категории для выбора
+$newsModel = new NewsModel();
+$categories = $newsModel->getAllCategories();
+?>
+
+    <!-- Profile Content -->
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="profile-avatar-container">
+                <div class="profile-avatar">
+                    <svg width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="45" fill="#9A8CC1" stroke="#6C5D8F" stroke-width="2"/>
+                        <path d="M50 35C58.2843 35 65 28.2843 65 20C65 11.7157 58.2843 5 50 5C41.7157 5 35 11.7157 35 20C35 28.2843 41.7157 35 50 35Z" fill="white"/>
+                        <path d="M50 45C63.8071 45 75 56.1929 75 70V85H25V70C25 56.1929 36.1929 45 50 45Z" fill="white"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="profile-info">
+                <h1 class="profile-username"><?php echo htmlspecialchars($userData['username']); ?></h1>
+                <p class="profile-email"><?php echo htmlspecialchars($userData['email']); ?></p>
+                <p class="profile-joined">Member since <?php echo date('F Y', strtotime($userData['created_at'])); ?></p>
+            </div>
+        </div>
+
+        <?php if ($flash_success): ?>
+            <div class="message success" style="margin: 1rem 0;"><?php echo htmlspecialchars($flash_success); ?></div>
+        <?php endif; ?>
+        <?php if ($flash_error): ?>
+            <div class="message error" style="margin: 1rem 0;"><?php echo htmlspecialchars($flash_error); ?></div>
+        <?php endif; ?>
+
+        <div class="profile-stats">
+            <div class="stat-item">
+                <div class="stat-number"><?php echo $stats['articles_read']; ?></div>
+                <div class="stat-label">Articles Read</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number"><?php echo $stats['comments_posted']; ?></div>
+                <div class="stat-label">Comments</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number"><?php echo $stats['following']; ?></div>
+                <div class="stat-label">Following</div>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <h2 class="section-title">Account Settings</h2>
+            <div class="settings-grid">
+                <div class="setting-item">
+                    <h3>Change Password</h3>
+                    <p>Update your account password</p>
+                    <form action="/change-password.php" method="POST" class="form form-vertical">
+                        <label for="current_password">Current password</label>
+                        <input type="password" id="current_password" name="current_password" required>
+                        <label for="new_password">New password</label>
+                        <input type="password" id="new_password" name="new_password" minlength="6" required>
+                        <label for="confirm_password">Confirm new password</label>
+                        <input type="password" id="confirm_password" name="confirm_password" minlength="6" required>
+                        <button type="submit" class="btn btn-secondary">Change Password</button>
+                    </form>
+                </div>
+                <div class="setting-item">
+                    <h3>Update Profile</h3>
+                    <p>Edit your personal information</p>
+                    <form action="/update-profile.php" method="POST" class="form form-vertical">
+                        <label for="upd_username">Username</label>
+                        <input type="text" id="upd_username" name="username" value="<?php echo htmlspecialchars($userData['username']); ?>" required>
+                        <label for="upd_email">Email</label>
+                        <input type="email" id="upd_email" name="email" value="<?php echo htmlspecialchars($userData['email']); ?>" required>
+                        <button type="submit" class="btn btn-secondary">Save Changes</button>
+                    </form>
+                </div>
+                <div class="setting-item">
+                    <h3>Notification Settings</h3>
+                    <p>Manage your notification preferences</p>
+                    <a href="#" class="btn btn-secondary" onclick="alert('Notification settings feature will be implemented soon!')">Notifications</a>
+                </div>
+                <div class="setting-item">
+                    <h3>Privacy Settings</h3>
+                    <p>Control your privacy options</p>
+                    <a href="#" class="btn btn-secondary" onclick="alert('Privacy settings feature will be implemented soon!')">Privacy</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <h2 class="section-title">Your Interests</h2>
+            <div class="interests-container">
+                <p class="interests-description">Based on your reading history and preferences</p>
+                <div class="interests-list">
+                    <?php if (!empty($userInterests)): ?>
+                        <?php foreach($userInterests as $interest): ?>
+                            <div class="interest-tag">
+                                <?php echo htmlspecialchars($interest['name']); ?>
+                                <span class="interest-weight">(<?php echo $interest['weight']; ?> reads)</span>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p>No reading history yet. Start reading articles to build your interests!</p>
+                    <?php endif; ?>
+                </div>
+                <form id="preferences-form" method="POST" action="/update-preferences.php">
+                    <div class="category-preferences">
+                        <?php foreach($categories as $category): ?>
+                            <label class="preference-item">
+                                <input type="checkbox" name="categories[]" value="<?php echo htmlspecialchars($category['slug']); ?>"
+                                    <?php echo in_array($category['slug'], $preferences['categories']) ? 'checked' : ''; ?>>
+                                <span><?php echo htmlspecialchars($category['name']); ?></span>
+                            </label>
+                        <?php endforeach; ?>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Interests</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="profile-actions">
+            <a href="/logout.php" class="btn btn-logout">Logout</a>
+            <a href="#" class="btn btn-delete" onclick="alert('Delete account feature will be implemented soon!')">Delete Account</a>
+        </div>
+        
+    </div>
+
+<?php require_once 'footer.php'; ?>
 =====================================
 
 FILE: assets/css/main.css
@@ -2494,53 +3328,271 @@ ADDITIONAL FILES:
 
 FILE: login-process.php
 =====================================
-[Contains login form processing logic]
+<?php
+session_start();
+
+require_once 'app/core/Database.php';
+require_once 'app/models/UserModel.php';
+
+$email = trim($_POST['email'] ?? '');
+$password = $_POST['password'] ?? '';
+
+$errors = [];
+
+if (empty($email)) $errors[] = "Email обязателен";
+if (empty($password)) $errors[] = "Пароль обязателен";
+
+if (!empty($errors)) {
+    $_SESSION['login_errors'] = $errors;
+    header('Location: /index.php');
+    exit();
+}
+
+$userModel = new UserModel();
+$user = $userModel->login($email, $password);
+
+if ($user) {
+    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['username'] = $user['username'];
+    $_SESSION['email'] = $user['email'];
+    // Перенаправляем на ту страницу, с которой пришли (например, после клика на "Войти" из профиля)
+    $redirect = $_SESSION['redirect_to'] ?? '/index.php';
+    unset($_SESSION['redirect_to']);
+    header("Location: $redirect");
+    exit();
+} else {
+    $_SESSION['login_errors'] = ["Неверный email или пароль"];
+    header('Location: /index.php');
+    exit();
+}
 
 FILE: register-process.php
 =====================================
-[Contains registration form processing logic]
+<?php
+session_start();
+
+// Подключаем базу данных и модель пользователя
+require_once 'app/core/Database.php';
+require_once 'app/models/UserModel.php';
+
+// Получаем данные формы
+$name = trim($_POST['name'] ?? '');
+$email = trim($_POST['email'] ?? '');
+$phone = trim($_POST['phone'] ?? '');
+$password = $_POST['password'] ?? '';
+$confirm_password = $_POST['confirm_password'] ?? '';
+
+$errors = [];
+
+// Валидация
+if (empty($name)) $errors[] = "Имя обязательно";
+if (empty($email)) $errors[] = "Email обязателен";
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "Неверный формат email";
+if (empty($password)) $errors[] = "Пароль обязателен";
+if (strlen($password) < 6) $errors[] = "Пароль должен быть минимум 6 символов";
+if ($password !== $confirm_password) $errors[] = "Пароли не совпадают";
+
+if (!empty($errors)) {
+    // Сохраняем ошибки в сессию и перенаправляем обратно
+    $_SESSION['registration_errors'] = $errors;
+    $_SESSION['old_input'] = [
+        'name' => $name,
+        'email' => $email,
+        'phone' => $phone
+    ];
+    header('Location: /index.php');
+    exit();
+}
+
+// Регистрация
+$userModel = new UserModel();
+$result = $userModel->register([
+    'username' => $name,
+    'email' => $email,
+    'phone' => $phone,
+    'password' => $password
+]);
+
+if ($result) {
+    // Успешная регистрация — автоматически логинимся
+    $user = $userModel->login($email, $password);
+    if ($user) {
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['email'] = $user['email'];
+        header('Location: /index.php');
+        exit();
+    }
+} else {
+    $_SESSION['registration_errors'][] = "Пользователь с таким email уже существует";
+    $_SESSION['old_input'] = [
+        'name' => $name,
+        'email' => $email,
+        'phone' => $phone
+    ];
+    header('Location: /index.php');
+    exit();
+}
 
 FILE: logout.php
 =====================================
-[Contains logout functionality]
+<?php
+// logout.php
+
+// Начинаем сессию (обязательно!)
+session_start();
+
+// Уничтожаем все данные сессии
+$_SESSION = [];
+
+// Уничтожаем саму сессию
+session_destroy();
+
+// Удаляем куки сессии (если они есть)
+if (ini_get("session.use_cookies")) {
+    $params = session_get_cookie_params();
+    setcookie(session_name(), '', time() - 42000,
+        $params["path"], $params["domain"],
+        $params["secure"], $params["httponly"]
+    );
+}
+
+// Перенаправляем на главную страницу
+header('Location: /index.php');
+exit();
 
 FILE: change-password.php
 =====================================
-[Contains password change functionality]
+<?php
+session_start();
+
+require_once __DIR__ . '/app/core/Database.php';
+require_once __DIR__ . '/app/models/UserModel.php';
+
+if (!isset($_SESSION['user_id'])) {
+    header('Location: /login.php');
+    exit();
+}
+
+$current = $_POST['current_password'] ?? '';
+$new = $_POST['new_password'] ?? '';
+$confirm = $_POST['confirm_password'] ?? '';
+
+if (empty($current) || empty($new) || empty($confirm)) {
+    $_SESSION['profile_error'] = 'Заполните все поля для смены пароля.';
+    header('Location: /profile.php');
+    exit();
+}
+
+if ($new !== $confirm) {
+    $_SESSION['profile_error'] = 'Новый пароль и подтверждение не совпадают.';
+    header('Location: /profile.php');
+    exit();
+}
+
+if (strlen($new) < 6) {
+    $_SESSION['profile_error'] = 'Длина нового пароля должна быть не менее 6 символов.';
+    header('Location: /profile.php');
+    exit();
+}
+
+$userModel = new UserModel();
+$updated = $userModel->updatePassword($_SESSION['user_id'], $current, $new);
+
+if ($updated) {
+    $_SESSION['profile_success'] = 'Пароль успешно изменён.';
+} else {
+    $_SESSION['profile_error'] = 'Текущий пароль неверен или произошла ошибка.';
+}
+
+header('Location: /profile.php');
+exit();
+?>
+
 
 FILE: update-profile.php
 =====================================
-[Contains profile update functionality]
+<?php
+session_start();
+
+require_once __DIR__ . '/app/core/Database.php';
+require_once __DIR__ . '/app/models/UserModel.php';
+
+if (!isset($_SESSION['user_id'])) {
+    header('Location: /login.php');
+    exit();
+}
+
+$username = trim($_POST['username'] ?? '');
+$email = trim($_POST['email'] ?? '');
+
+if ($username === '' || $email === '') {
+    $_SESSION['profile_error'] = 'Имя пользователя и email обязательны.';
+    header('Location: /profile.php');
+    exit();
+}
+
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $_SESSION['profile_error'] = 'Неверный формат email.';
+    header('Location: /profile.php');
+    exit();
+}
+
+$userModel = new UserModel();
+if (!$userModel->isEmailAvailableForUser($email, $_SESSION['user_id'])) {
+    $_SESSION['profile_error'] = 'Этот email уже занят другим пользователем.';
+    header('Location: /profile.php');
+    exit();
+}
+
+$updated = $userModel->update($_SESSION['user_id'], [
+    'username' => $username,
+    'email' => $email,
+]);
+
+if ($updated) {
+    $_SESSION['username'] = $username;
+    $_SESSION['email'] = $email;
+    $_SESSION['profile_success'] = 'Профиль обновлён.';
+} else {
+    $_SESSION['profile_error'] = 'Не удалось обновить профиль.';
+}
+
+header('Location: /profile.php');
+exit();
+?>
 
 FILE: update-preferences.php
 =====================================
-[Contains user preferences update functionality]
+<?php
+session_start();
 
-FILE: app/views/auth/login.php
-=====================================
-[Contains login view template]
+require_once __DIR__ . '/app/core/Database.php';      // Для Singleton
+require_once __DIR__ . '/app/models/UserModel.php';   // КЛЮЧЕВОЙ ШАГ!
 
-FILE: app/views/auth/register.php
-=====================================
-[Contains registration view template]
+// Проверяем авторизацию
+if (!isset($_SESSION['user_id'])) {
+    header('Location: /login.php');
+    exit();
+}
 
-FILE: app/views/home/index.php
-=====================================
-[Contains home page view template]
+// Получаем данные из POST
+$categories = $_POST['categories'] ?? [];
 
-FILE: app/views/logouts/header.php
-=====================================
-[Contains header view template]
+// Создаём экземпляр модели
+$userModel = new UserModel();
 
-FILE: app/views/logouts/footer.php
-=====================================
-[Contains footer view template]
+// Обновляем предпочтения пользователя
+$result = $userModel->updatePreferences($_SESSION['user_id'], ['categories' => $categories]);
 
-FILE: app/views/profile/index.php
-=====================================
-[Contains profile view template]
+if ($result) {
+    $_SESSION['preferences'] = ['categories' => $categories]; // Обновляем сессию
+    echo json_encode(['success' => true, 'message' => 'Preferences updated!']);
+} else {
+    echo json_encode(['success' => false, 'message' => 'Failed to update preferences.']);
+}
+?>
 
-=====================================
 
 RESOURCES DIRECTORY:
 ===================
