@@ -25,7 +25,7 @@ if ($id <= 0) {
 }
 
 $newsModel = new NewsModel();
-// Предполагаем, что метод getFullNews существует и возвращает полную информацию о новости
+// Метод getFullNews возвращает полную информацию о новости
 $newsItem = $newsModel->getFullNews($id);
 if (!$newsItem) {
     http_response_code(404);
@@ -59,7 +59,7 @@ if ($_POST) {
             'image_url' => $imageUrl ?: null
         ];
 
-        if ($newsModel->update($id, $data)) { // Предполагаем, что метод update существует
+        if ($newsModel->update($id, $data)) {
             $success = 'Новость успешно обновлена!';
             // Обновляем данные новости для отображения
             $newsItem = array_merge($newsItem, $data);

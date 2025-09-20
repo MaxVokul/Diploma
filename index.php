@@ -30,54 +30,86 @@ if (isset($_SESSION['user_id'])) {
     $interests = $userModelTmp->getUserInterests($_SESSION['user_id']);
     if (!empty($interests) && !empty($interests[0]['category_id'])) {
         $topCategoryId = (int)$interests[0]['category_id'];
-        $forYouNews = $newsModel->getByCategory($topCategoryId, 20);
+        $categoryNews = $newsModel->getByCategory($topCategoryId, 50);
+        
+        // Фильтруем только уникальные статьи (исключая топ-сториз)
+        $uniqueForYou = [];
+        foreach ($categoryNews as $item) {
+            $id = (int)$item['id'];
+            if (!in_array($id, $topStoryIds, true)) {
+                $uniqueForYou[] = $item;
+                if (count($uniqueForYou) >= 12) break;
+            }
+        }
+        
+        // Если не хватает статей из топ-категории, дополняем из других категорий
+        if (count($uniqueForYou) < 12) {
+            $additionalNews = $newsModel->getLatest(100);
+            shuffle($additionalNews);
+            $usedIds = array_merge($topStoryIds, array_map(function($item){ return (int)$item['id']; }, $uniqueForYou));
+            foreach ($additionalNews as $item) {
+                $id = (int)$item['id'];
+                if (!in_array($id, $usedIds, true)) {
+                    $uniqueForYou[] = $item;
+                    $usedIds[] = $id;
+                    if (count($uniqueForYou) >= 12) break;
+                }
+            }
+        }
+        
+        $forYouNews = $uniqueForYou;
         $forYouHeadline = 'For You';
         $forYouSubtitle = 'Recommended based on your interests';
     } else {
         // Новый пользователь: показываем "What's new?" со случайной подборкой из последних
-        $recentPool = $newsModel->getLatest(80);
+        $recentPool = $newsModel->getLatest(100);
         shuffle($recentPool);
-        $forYouNews = array_slice($recentPool, 0, 12);
+        $uniqueForYou = [];
+        foreach ($recentPool as $item) {
+            $id = (int)$item['id'];
+            if (!in_array($id, $topStoryIds, true)) {
+                $uniqueForYou[] = $item;
+                if (count($uniqueForYou) >= 12) break;
+            }
+        }
+        $forYouNews = $uniqueForYou;
         $forYouHeadline = "What's new?";
         $forYouSubtitle = '';
     }
 } else {
     // Не авторизован: показываем "What's new?" со случайной подборкой из последних
-    $recentPool = $newsModel->getLatest(80);
+    $recentPool = $newsModel->getLatest(100);
     shuffle($recentPool);
-    $forYouNews = array_slice($recentPool, 0, 12);
+    $uniqueForYou = [];
+    foreach ($recentPool as $item) {
+        $id = (int)$item['id'];
+        if (!in_array($id, $topStoryIds, true)) {
+            $uniqueForYou[] = $item;
+            if (count($uniqueForYou) >= 12) break;
+        }
+    }
+    $forYouNews = $uniqueForYou;
     $forYouHeadline = "What's new?";
     $forYouSubtitle = '';
 }
 
-// Удаляем дубликаты с Top stories и дополняем при необходимости
-$desiredCount = 12;
-$pickedIds = $topStoryIds;
-$uniqueForYou = [];
-foreach ($forYouNews as $item) {
+// Собираем все использованные ID для карусели
+$usedIds = array_merge($topStoryIds, array_map(function($item){ return (int)$item['id']; }, $forYouNews));
+
+// Создаем карусель с случайными статьями из всех категорий (исключая уже показанные)
+$carouselNews = [];
+$carouselCount = 8;
+$allNews = $newsModel->getLatest(200);
+shuffle($allNews);
+
+foreach ($allNews as $item) {
     $id = (int)$item['id'];
-    if (!in_array($id, $pickedIds, true)) {
-        $uniqueForYou[] = $item;
-        $pickedIds[] = $id;
-        if (count($uniqueForYou) >= $desiredCount) break;
+    if (!in_array($id, $usedIds, true)) {
+        $carouselNews[] = $item;
+        $usedIds[] = $id;
+        if (count($carouselNews) >= $carouselCount) break;
     }
 }
-
-if (count($uniqueForYou) < $desiredCount) {
-    // Пополняем из последних новостей случайным образом, исключая уже выбранные и топ-сториз
-    $pool = $newsModel->getLatest(100);
-    shuffle($pool);
-    foreach ($pool as $cand) {
-        $id = (int)$cand['id'];
-        if (!in_array($id, $pickedIds, true)) {
-            $uniqueForYou[] = $cand;
-            $pickedIds[] = $id;
-            if (count($uniqueForYou) >= $desiredCount) break;
-        }
-    }
-}
-
-$forYouNews = $uniqueForYou;
 
 // Получаем все категории
 $categories = $newsModel->getAllCategories();
@@ -102,6 +134,46 @@ include 'header.php';
                 </div>
             </a>
         <?php endforeach; ?>
+    </section>
+
+    <!-- Carousel Section -->
+    <section class="carousel-section">
+        <div class="carousel-header">
+            <h2 class="carousel-title">Discover More</h2>
+            <p class="carousel-subtitle">Explore even more stories</p>
+        </div>
+        
+        
+        <div class="carousel-container">
+            <button class="carousel-btn carousel-btn-prev" id="carouselPrev">‹</button>
+            <div class="carousel-wrapper">
+                <div class="carousel-track" id="carouselTrack">
+                    <?php if (!empty($carouselNews)): ?>
+                        <?php foreach ($carouselNews as $carouselItem): ?>
+                            <div class="carousel-item">
+                                <a href="/news.php?id=<?php echo (int)$carouselItem['id']; ?>" class="carousel-link">
+                                    <img src="<?php echo htmlspecialchars($carouselItem['image_url'] ?? 'resources/Rectangle 20.png'); ?>" 
+                                         class="carousel-img" 
+                                         alt="<?php echo htmlspecialchars($carouselItem['title']); ?>">
+                                    <div class="carousel-content">
+                                        <h3 class="carousel-item-title"><?php echo htmlspecialchars($carouselItem['title']); ?></h3>
+                                        <p class="carousel-item-excerpt"><?php echo htmlspecialchars(substr($carouselItem['excerpt'], 0, 100)) . (strlen($carouselItem['excerpt']) > 100 ? '...' : ''); ?></p>
+                                        <p class="carousel-item-meta">
+                                            <?php echo date('H:i', strtotime($carouselItem['published_at'])); ?> ago / by <?php echo htmlspecialchars($carouselItem['author_name']); ?>
+                                        </p>
+                                    </div>
+                                </a>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div style="padding: 20px; text-align: center; color: #666;">
+                            <p>No articles available for carousel</p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <button class="carousel-btn carousel-btn-next" id="carouselNext">›</button>
+        </div>
     </section>
 
     <section class="foryou">

@@ -64,6 +64,7 @@
 <script defer src="assets/js/phone.js"></script>
 <script defer src="assets/js/navbar.js"></script>
 <script defer src="assets/js/slidingmenu.js"></script>
+<script defer src="assets/js/carousel.js"></script>
 
 </body>
 </html>

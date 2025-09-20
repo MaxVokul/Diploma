@@ -146,7 +146,7 @@ try {
             <?php if ($isAdmin): ?>
                 <a href="/admin/" class="admin-link" title="Админ-панель">
                     <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
-                         width="25.000000pt" height="25.000000pt" viewBox="0 0 1182.000000 1280.000000" margin="20px"
+                         width="25.000000pt" height="25.000000pt" viewBox="0 0 1182.000000 1280.000000"
                          preserveAspectRatio="xMidYMid meet">
                         <g transform="translate(0.000000,1280.000000) scale(0.100000,-0.100000)"
                            fill="#000000" stroke="none">

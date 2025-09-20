@@ -28,7 +28,8 @@ $allNews = $newsModel->getLatest(100); // Получаем последние 10
     <meta charset="UTF-8">
     <title>Управление новостями - NEWS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" media="(min-width: 570px)" href="/assets/css/main.css">
+    <link rel="stylesheet" media="(max-width: 570px)" href="/assets/css/mobile.css">
     <link href="https://fonts.googleapis.com/css2?family=Aclonica&display=swap" rel="stylesheet">
     
 </head>
