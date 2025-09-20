@@ -151,6 +151,9 @@ header{
     padding: 0;
     height: auto;
     box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.527);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 .header.sticky {
     position: fixed;
@@ -437,6 +440,8 @@ header{
     overflow: hidden;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     margin-right: 20px;
+    position: relative;
+    z-index: 1;
 }
 
 .carousel-item:hover {
