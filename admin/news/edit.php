@@ -135,8 +135,8 @@ if ($_POST) {
             </div>
 
             <div class="form-group">
-                <label for="image_url">URL изображения</label>
-                <input type="url" id="image_url" name="image_url" value="<?php echo htmlspecialchars($newsItem['image_url'] ?? ''); ?>">
+                <label for="image_url">URL изображения или путь к файлу</label>
+                <input type="text" id="image_url" name="image_url" value="<?php echo htmlspecialchars($newsItem['image_url'] ?? ''); ?>">
             </div>
 
             <div class="form-group">

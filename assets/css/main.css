@@ -675,6 +675,7 @@ header{
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 8px rgba(154, 140, 193, 0.3);
+    box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.527);
 }
 
 .load-more-container .btn:hover {
