@@ -1,6 +1,7 @@
 :root{
     --heading: "Roboto", serif;
     --text: "Roboto", serif;
+    /*--primary: black;*/
     --primary: rgb(154,140,193);
     --secondary1: rgba(53, 53, 53, 0.178);
     --secondary2: rgb(255, 255, 255);
@@ -652,6 +653,35 @@ header{
 .back-to-top.visible {
     opacity: 1;
     visibility: visible;
+}
+
+/* Load More Button Styles */
+.load-more-container {
+    margin: 2dvh 0;
+    padding: 20px;
+    text-align: center;
+    background-color: rgba(154, 140, 193, 0.05);
+    border-radius: 15px;
+    border: 2px dashed var(--primary);
+}
+
+.load-more-container .btn {
+    background-color: var(--primary);
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(154, 140, 193, 0.3);
+}
+
+.load-more-container .btn:hover {
+    background-color: #a090c0;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(154, 140, 193, 0.4);
 }
 
 .back{

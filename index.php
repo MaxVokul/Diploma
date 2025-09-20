@@ -38,12 +38,12 @@ if (isset($_SESSION['user_id'])) {
             $id = (int)$item['id'];
             if (!in_array($id, $topStoryIds, true)) {
                 $uniqueForYou[] = $item;
-                if (count($uniqueForYou) >= 12) break;
+                // Remove the 12 article limit to allow Load More functionality
             }
         }
         
         // Если не хватает статей из топ-категории, дополняем из других категорий
-        if (count($uniqueForYou) < 12) {
+        if (count($uniqueForYou) < 50) { // Increased from 12 to 50 for better Load More experience
             $additionalNews = $newsModel->getLatest(100);
             shuffle($additionalNews);
             $usedIds = array_merge($topStoryIds, array_map(function($item){ return (int)$item['id']; }, $uniqueForYou));
@@ -52,7 +52,7 @@ if (isset($_SESSION['user_id'])) {
                 if (!in_array($id, $usedIds, true)) {
                     $uniqueForYou[] = $item;
                     $usedIds[] = $id;
-                    if (count($uniqueForYou) >= 12) break;
+                    if (count($uniqueForYou) >= 50) break; // Increased from 12 to 50
                 }
             }
         }
@@ -69,7 +69,7 @@ if (isset($_SESSION['user_id'])) {
             $id = (int)$item['id'];
             if (!in_array($id, $topStoryIds, true)) {
                 $uniqueForYou[] = $item;
-                if (count($uniqueForYou) >= 12) break;
+                // Remove the 12 article limit to allow Load More functionality
             }
         }
         $forYouNews = $uniqueForYou;
@@ -85,7 +85,7 @@ if (isset($_SESSION['user_id'])) {
         $id = (int)$item['id'];
         if (!in_array($id, $topStoryIds, true)) {
             $uniqueForYou[] = $item;
-            if (count($uniqueForYou) >= 12) break;
+            // Remove the 12 article limit to allow Load More functionality
         }
     }
     $forYouNews = $uniqueForYou;
@@ -220,9 +220,13 @@ include 'header.php';
     </section>
 
     <div class="foryouall">
-        <section class="foryouin">
-            <?php $rowIndex = 0; ?>
-            <?php for ($i = 0; $i < count($forYouNews); $i += 3): ?>
+        <section class="foryouin" id="foryouSection">
+            <?php 
+            // Show only first 4 rows initially (12 articles)
+            $initialRows = min(4, ceil(count($forYouNews) / 3));
+            $rowIndex = 0; 
+            ?>
+            <?php for ($i = 0; $i < $initialRows * 3 && $i < count($forYouNews); $i += 3): ?>
                 <div class="row">
                     <?php for ($j = 0; $j < 3 && ($i + $j) < count($forYouNews); $j++): ?>
                         <?php $newsItem = $forYouNews[$i + $j]; ?>
@@ -258,9 +262,38 @@ include 'header.php';
                 </div>
             <?php endfor; ?>
         </section>
+        
+        <?php if (count($forYouNews) > 12): ?>
+            <div class="load-more-container">
+                <button id="loadMoreBtn" class="btn btn-primary">Load More Articles</button>
+                <p style="margin-top: 10px; color: #666; font-size: 0.9rem;">
+                    Showing 12 of <?php echo count($forYouNews); ?> articles
+                </p>
+                <!-- Debug info -->
+                <p style="margin-top: 5px; color: #999; font-size: 0.8rem;">
+                    Debug: Total articles = <?php echo count($forYouNews); ?>, Should show button = <?php echo count($forYouNews) > 12 ? 'YES' : 'NO'; ?>
+                </p>
+            </div>
+        <?php else: ?>
+            <div class="load-more-container" style="display: none;">
+                <button id="loadMoreBtn" class="btn btn-primary">Load More Articles</button>
+                <p style="margin-top: 10px; color: #666; font-size: 0.9rem;">
+                    All articles loaded (Total: <?php echo count($forYouNews); ?>)
+                </p>
+                <!-- Debug info -->
+                <p style="margin-top: 5px; color: #999; font-size: 0.8rem;">
+                    Debug: Total articles = <?php echo count($forYouNews); ?>, Should show button = NO
+                </p>
+            </div>
+        <?php endif; ?>
     </div>
 
     <!-- Back to Top Arrow Button -->
     <button class="back-to-top" id="backToTop" title="Back to Top">↑</button>
+
+    <!-- Pass PHP data to JavaScript -->
+    <script>
+        window.forYouNewsData = <?php echo json_encode($forYouNews); ?>;
+    </script>
 
 <?php include 'footer.php'; ?>
