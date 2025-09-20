@@ -19,7 +19,30 @@ if (!$userModel->isAdmin($_SESSION['user_id'])) {
 }
 
 $newsModel = new NewsModel();
-$allNews = $newsModel->getLatest(100); // Получаем последние 100 новостей
+
+// Search settings
+$searchTerm = trim($_GET['search'] ?? '');
+$isSearching = !empty($searchTerm);
+
+// Pagination settings
+$articlesPerPage = 50;
+$currentPage = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$offset = ($currentPage - 1) * $articlesPerPage;
+
+// Sorting settings
+$sortBy = $_GET['sort'] ?? 'id';
+$sortOrder = $_GET['order'] ?? 'DESC';
+
+// Get total count and articles for current page
+if ($isSearching) {
+    $totalArticles = $newsModel->getSearchCount($searchTerm);
+    $allNews = $newsModel->searchForAdmin($searchTerm, $articlesPerPage, $offset, $sortBy, $sortOrder);
+} else {
+    $totalArticles = $newsModel->getTotalCount();
+    $allNews = $newsModel->getAllForAdmin($articlesPerPage, $offset, $sortBy, $sortOrder);
+}
+
+$totalPages = ceil($totalArticles / $articlesPerPage);
 
 ?>
 <!DOCTYPE html>
@@ -52,20 +75,78 @@ $allNews = $newsModel->getLatest(100); // Получаем последние 10
 
     <main class="admin-main">
         <h1>Управление новостями</h1>
-        <a href="/admin/news/create.php" class="btn-create">Создать новость</a>
+        
+        <div class="admin-controls">
+            <a href="/admin/news/create.php" class="btn-create">Создать новость</a>
+            
+            <form method="GET" class="search-form">
+                <div class="search-input-group">
+                    <input type="text" name="search" value="<?php echo htmlspecialchars($searchTerm); ?>" 
+                           placeholder="Поиск по заголовку, содержанию, автору или категории..." 
+                           class="search-input">
+                    <button type="submit" class="search-btn">🔍</button>
+                    <?php if ($isSearching): ?>
+                        <a href="?" class="clear-search-btn">✕</a>
+                    <?php endif; ?>
+                </div>
+                <!-- Preserve sort parameters -->
+                <input type="hidden" name="sort" value="<?php echo htmlspecialchars($sortBy); ?>">
+                <input type="hidden" name="order" value="<?php echo htmlspecialchars($sortOrder); ?>">
+            </form>
+        </div>
 
         <?php if (empty($allNews)): ?>
-            <p>Новостей пока нет.</p>
+            <?php if ($isSearching): ?>
+                <div class="no-results">
+                    <p>По запросу "<?php echo htmlspecialchars($searchTerm); ?>" ничего не найдено.</p>
+                    <a href="?" class="btn-clear-search">Показать все новости</a>
+                </div>
+            <?php else: ?>
+                <p>Новостей пока нет.</p>
+            <?php endif; ?>
         <?php else: ?>
-            <table>
+            <div class="admin-info">
+                <?php if ($isSearching): ?>
+                    <p>Найдено <?php echo $totalArticles; ?> результатов по запросу "<?php echo htmlspecialchars($searchTerm); ?>" 
+                       (Показано <?php echo count($allNews); ?> из <?php echo $totalArticles; ?>, Страница <?php echo $currentPage; ?> из <?php echo $totalPages; ?>)</p>
+                <?php else: ?>
+                    <p>Showing <?php echo count($allNews); ?> of <?php echo $totalArticles; ?> articles (Page <?php echo $currentPage; ?> of <?php echo $totalPages; ?>)</p>
+                <?php endif; ?>
+            </div>
+            
+            <table class="admin-table">
                 <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Заголовок</th>
-                    <th>Категория</th>
-                    <th>Автор</th>
-                    <th>Дата</th>
-                    <th>Статус</th>
+                    <th>
+                        <a href="?sort=id&order=<?php echo ($sortBy == 'id' && $sortOrder == 'ASC') ? 'DESC' : 'ASC'; ?>&page=<?php echo $currentPage; ?><?php echo $isSearching ? '&search=' . urlencode($searchTerm) : ''; ?>">
+                            ID <?php echo ($sortBy == 'id') ? ($sortOrder == 'ASC' ? '↑' : '↓') : ''; ?>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="?sort=title&order=<?php echo ($sortBy == 'title' && $sortOrder == 'ASC') ? 'DESC' : 'ASC'; ?>&page=<?php echo $currentPage; ?><?php echo $isSearching ? '&search=' . urlencode($searchTerm) : ''; ?>">
+                            Заголовок <?php echo ($sortBy == 'title') ? ($sortOrder == 'ASC' ? '↑' : '↓') : ''; ?>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="?sort=category_name&order=<?php echo ($sortBy == 'category_name' && $sortOrder == 'ASC') ? 'DESC' : 'ASC'; ?>&page=<?php echo $currentPage; ?><?php echo $isSearching ? '&search=' . urlencode($searchTerm) : ''; ?>">
+                            Категория <?php echo ($sortBy == 'category_name') ? ($sortOrder == 'ASC' ? '↑' : '↓') : ''; ?>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="?sort=author_name&order=<?php echo ($sortBy == 'author_name' && $sortOrder == 'ASC') ? 'DESC' : 'ASC'; ?>&page=<?php echo $currentPage; ?><?php echo $isSearching ? '&search=' . urlencode($searchTerm) : ''; ?>">
+                            Автор <?php echo ($sortBy == 'author_name') ? ($sortOrder == 'ASC' ? '↑' : '↓') : ''; ?>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="?sort=published_at&order=<?php echo ($sortBy == 'published_at' && $sortOrder == 'ASC') ? 'DESC' : 'ASC'; ?>&page=<?php echo $currentPage; ?><?php echo $isSearching ? '&search=' . urlencode($searchTerm) : ''; ?>">
+                            Дата <?php echo ($sortBy == 'published_at') ? ($sortOrder == 'ASC' ? '↑' : '↓') : ''; ?>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="?sort=is_published&order=<?php echo ($sortBy == 'is_published' && $sortOrder == 'ASC') ? 'DESC' : 'ASC'; ?>&page=<?php echo $currentPage; ?><?php echo $isSearching ? '&search=' . urlencode($searchTerm) : ''; ?>">
+                            Статус <?php echo ($sortBy == 'is_published') ? ($sortOrder == 'ASC' ? '↑' : '↓') : ''; ?>
+                        </a>
+                    </th>
                     <th>Действия</th>
                 </tr>
                 </thead>
@@ -90,6 +171,47 @@ $allNews = $newsModel->getLatest(100); // Получаем последние 10
                 <?php endforeach; ?>
                 </tbody>
             </table>
+            
+            <?php if ($totalPages > 1): ?>
+                <div class="pagination-container">
+                    <div class="pagination">
+                        <?php 
+                        $searchParam = $isSearching ? '&search=' . urlencode($searchTerm) : '';
+                        ?>
+                        <?php if ($currentPage > 1): ?>
+                            <a href="?sort=<?php echo $sortBy; ?>&order=<?php echo $sortOrder; ?>&page=1<?php echo $searchParam; ?>" class="pagination-btn">« First</a>
+                            <a href="?sort=<?php echo $sortBy; ?>&order=<?php echo $sortOrder; ?>&page=<?php echo $currentPage - 1; ?><?php echo $searchParam; ?>" class="pagination-btn">‹ Previous</a>
+                        <?php endif; ?>
+                        
+                        <?php
+                        // Calculate page range to show
+                        $startPage = max(1, $currentPage - 2);
+                        $endPage = min($totalPages, $currentPage + 2);
+                        
+                        // Adjust range if we're near the beginning or end
+                        if ($endPage - $startPage < 4) {
+                            if ($startPage == 1) {
+                                $endPage = min($totalPages, $startPage + 4);
+                            } else {
+                                $startPage = max(1, $endPage - 4);
+                            }
+                        }
+                        
+                        for ($i = $startPage; $i <= $endPage; $i++):
+                        ?>
+                            <a href="?sort=<?php echo $sortBy; ?>&order=<?php echo $sortOrder; ?>&page=<?php echo $i; ?><?php echo $searchParam; ?>" 
+                               class="pagination-btn <?php echo $i == $currentPage ? 'active' : ''; ?>">
+                                <?php echo $i; ?>
+                            </a>
+                        <?php endfor; ?>
+                        
+                        <?php if ($currentPage < $totalPages): ?>
+                            <a href="?sort=<?php echo $sortBy; ?>&order=<?php echo $sortOrder; ?>&page=<?php echo $currentPage + 1; ?><?php echo $searchParam; ?>" class="pagination-btn">Next ›</a>
+                            <a href="?sort=<?php echo $sortBy; ?>&order=<?php echo $sortOrder; ?>&page=<?php echo $totalPages; ?><?php echo $searchParam; ?>" class="pagination-btn">Last »</a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
         <?php endif; ?>
     </main>
 </div>

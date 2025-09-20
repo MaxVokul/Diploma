@@ -220,4 +220,88 @@ class NewsModel {
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return (int)$result['total'];
     }
+
+    // Получить все новости для админ-панели с пагинацией и сортировкой
+    public function getAllForAdmin($limit = 50, $offset = 0, $sortBy = 'id', $sortOrder = 'DESC') {
+        // Валидация параметров сортировки
+        $allowedSortFields = ['id', 'title', 'category_name', 'author_name', 'published_at', 'is_published'];
+        $sortBy = in_array($sortBy, $allowedSortFields) ? $sortBy : 'id';
+        $sortOrder = strtoupper($sortOrder) === 'ASC' ? 'ASC' : 'DESC';
+
+        $sql = "SELECT n.*, c.name as category_name, c.slug as category_slug, 
+                u.username as author_name 
+                FROM news n 
+                JOIN categories c ON n.category_id = c.id 
+                JOIN users u ON n.author_id = u.id 
+                ORDER BY {$sortBy} {$sortOrder}
+                LIMIT :limit OFFSET :offset";
+
+        $stmt = $this->db->getConnection()->prepare($sql);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
+    // Получить общее количество всех новостей для админ-панели
+    public function getTotalCount() {
+        $sql = "SELECT COUNT(*) as total FROM news";
+        $stmt = $this->db->getConnection()->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return (int)$result['total'];
+    }
+
+    // Поиск новостей для админ-панели с пагинацией и сортировкой
+    public function searchForAdmin($searchTerm, $limit = 50, $offset = 0, $sortBy = 'id', $sortOrder = 'DESC') {
+        // Валидация параметров сортировки
+        $allowedSortFields = ['id', 'title', 'category_name', 'author_name', 'published_at', 'is_published'];
+        $sortBy = in_array($sortBy, $allowedSortFields) ? $sortBy : 'id';
+        $sortOrder = strtoupper($sortOrder) === 'ASC' ? 'ASC' : 'DESC';
+
+        $sql = "SELECT n.*, c.name as category_name, c.slug as category_slug, 
+                u.username as author_name 
+                FROM news n 
+                JOIN categories c ON n.category_id = c.id 
+                JOIN users u ON n.author_id = u.id 
+                WHERE (n.title LIKE :search1 OR n.content LIKE :search2 OR n.excerpt LIKE :search3 
+                       OR c.name LIKE :search4 OR u.username LIKE :search5)
+                ORDER BY {$sortBy} {$sortOrder}
+                LIMIT :limit OFFSET :offset";
+
+        $stmt = $this->db->getConnection()->prepare($sql);
+        $searchPattern = "%{$searchTerm}%";
+        $stmt->bindValue(':search1', $searchPattern, PDO::PARAM_STR);
+        $stmt->bindValue(':search2', $searchPattern, PDO::PARAM_STR);
+        $stmt->bindValue(':search3', $searchPattern, PDO::PARAM_STR);
+        $stmt->bindValue(':search4', $searchPattern, PDO::PARAM_STR);
+        $stmt->bindValue(':search5', $searchPattern, PDO::PARAM_STR);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
+    // Получить количество результатов поиска
+    public function getSearchCount($searchTerm) {
+        $sql = "SELECT COUNT(*) as total 
+                FROM news n 
+                JOIN categories c ON n.category_id = c.id 
+                JOIN users u ON n.author_id = u.id 
+                WHERE (n.title LIKE :search1 OR n.content LIKE :search2 OR n.excerpt LIKE :search3 
+                       OR c.name LIKE :search4 OR u.username LIKE :search5)";
+
+        $stmt = $this->db->getConnection()->prepare($sql);
+        $searchPattern = "%{$searchTerm}%";
+        $stmt->bindValue(':search1', $searchPattern, PDO::PARAM_STR);
+        $stmt->bindValue(':search2', $searchPattern, PDO::PARAM_STR);
+        $stmt->bindValue(':search3', $searchPattern, PDO::PARAM_STR);
+        $stmt->bindValue(':search4', $searchPattern, PDO::PARAM_STR);
+        $stmt->bindValue(':search5', $searchPattern, PDO::PARAM_STR);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return (int)$result['total'];
+    }
 }
