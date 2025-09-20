@@ -62,9 +62,9 @@
 
 <script defer src="assets/js/script.js"></script>
 <script defer src="assets/js/phone.js"></script>
-
 <script defer src="assets/js/slidingmenu.js"></script>
 <script defer src="assets/js/carousel.js"></script>
+<script defer src="assets/js/index.js"></script>
 
 </body>
 </html>

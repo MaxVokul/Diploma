@@ -218,6 +218,9 @@ header{
     border-color: var(--secondary1);
     border-width: 2px;
 }
+.tstext p{
+    color: #666666;
+}
 .imgts{
     width: 15%;
     height: fit-content;
@@ -272,6 +275,7 @@ header{
     justify-content: space-between;
     align-items: center;
     box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.527);
+    min-height: 300px;
 }
 
 .row:nth-child(odd) .rect:nth-child(2) {
@@ -281,6 +285,7 @@ header{
     background-color: var(--secondary2);
     border-radius: 20px;
     box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.527);
+    min-height: 140px;
 }
 
 .row:nth-child(odd) .rect:nth-child(3) {
@@ -290,8 +295,8 @@ header{
     background-color: var(--secondary2);
     border-radius: 20px;
     box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.527);
+    min-height: 140px;
 }
-
 
 .row:nth-child(even) .rect:first-child {
     grid-area: 1 / 1 / 2 / 2;
@@ -300,6 +305,7 @@ header{
     background-color: var(--secondary2);
     border-radius: 20px;
     box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.527);
+    min-height: 140px;
 }
 
 .row:nth-child(even) .rect:nth-child(2) {
@@ -309,6 +315,7 @@ header{
     background-color: var(--secondary2);
     border-radius: 20px;
     box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.527);
+    min-height: 140px;
 }
 
 .row:nth-child(even) .rect:nth-child(3) {
@@ -321,6 +328,7 @@ header{
     justify-content: space-between;
     align-items: center;
     box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.527);
+    min-height: 300px;
 }
 
 /*Блок For you: Для картинок и текста:*/
@@ -335,46 +343,77 @@ header{
     border-radius: inherit;
 }
 
-.rect:first-child .rectp{
-    margin: 20px;
+.rectp{
+    margin: 15px;
     display: block;
+    font-size: 0.9rem;
+    color: #666;
 }
 .recttxt{
     width: 80%;
-    margin: 0 0 3dvh 0;
+    margin: 0 0 2dvh 0;
 }
 
 .rect:first-child .rectimg {
     width: 80%;
-    height: auto;
-    margin: 4dvh;
+    height: 150px;
+    margin: 2dvh;
     border-radius: 8px;
     align-self: center;
+    object-fit: cover;
 }
 .rect:nth-child(2) .rectimg,
 .rect:nth-child(3) .rectimg {
-    margin: 2dvh;
-    width: 25%;
-    height: fit-content;
+    margin: 1dvh;
+    width: 30%;
+    height: 80px;
     align-self: center;
+    object-fit: cover;
 }
 
 .rect:nth-child(2) .recttxt,
 .rect:nth-child(3) .recttxt {
-    margin: 2dvh 0;
+    margin: 1dvh 0;
+    width: 65%;
 }
+
+.recttxt h2 {
+    font-size: 1rem;
+    margin: 0 0 5px 0;
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.recttxt p {
+    font-size: 0.85rem;
+    line-height: 1.3;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    color: #666
+}
+
 .row:nth-child(even) .rect:first-child .rectimg{
-    margin: 2dvh;
-    width: 25%;
-    height: fit-content;
+    margin: 1dvh;
+    width: 30%;
+    height: 80px;
     align-self: center;
+    object-fit: cover;
 }
 .row:nth-child(even) .rect:last-child .rectimg{
     width: 80%;
-    height: auto;
-    margin: 4dvh;
+    height: 150px;
+    margin: 2dvh;
     border-radius: 8px;
     align-self: center;
+    object-fit: cover;
 }
 
 
@@ -429,7 +468,8 @@ header{
 .carousel-track {
     display: flex;
     transition: transform 0.5s ease-in-out;
-    gap: 2dvw;
+    gap: 1.5dvw;
+    padding: 0 1dvw;
 }
 
 .carousel-item {
@@ -439,7 +479,6 @@ header{
     box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    margin-right: 20px;
     position: relative;
     z-index: 1;
 }
@@ -581,14 +620,42 @@ header{
     }
 }
 
-.back{
+/* Back to Top Arrow Button */
+.back-to-top {
+    position: fixed;
+    bottom: 60px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    z-index: 1000;
     display: flex;
-    text-align: center;
-    background-color: rgb(245, 242, 242);
-    border-radius: 20px;
-    padding: 20px 20px;
-    margin: 2dvh 0;
-    box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.527);
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.back-to-top:hover {
+    background-color: #a090c0;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.back{
+    display: none;
 }
 #back{
     margin: 0;
@@ -1336,10 +1403,20 @@ tr:nth-child(even) { background-color: #f9f9f9; }
     .foryouh2 { width: 100%; margin: 1dvh 0; }
     .foryouin { width: 100%; padding: 0 1dvw; }
     .row { grid-template-columns: 1fr; grid-template-rows: auto; grid-column-gap: 0; grid-row-gap: 1dvh; margin: 1dvh 0; }
-    .rect { width: 100%; margin-bottom: 1dvh; }
-    .rectimg { width: 100%; height: auto; border-radius: 8px; margin: 1dvh 0; }
+    .rect { width: 100%; margin-bottom: 1dvh; min-height: 150px; }
+    .rectimg { width: 100%; height: 100px; border-radius: 8px; margin: 1dvh 0; }
     .recttxt { width: 100%; margin: 1dvh 0; }
     .rectp { margin: 0.5dvh 0; }
+    .back-to-top { bottom: 20px; right: 20px; width: 45px; height: 45px; font-size: 1.3rem; }
+    .row:nth-child(odd) .rect:first-child,
+    .row:nth-child(even) .rect:last-child,
+    .row:nth-child(odd) .rect:nth-child(2),
+    .row:nth-child(odd) .rect:nth-child(3),
+    .row:nth-child(even) .rect:first-child,
+    .row:nth-child(even) .rect:nth-child(2) {
+        grid-area: auto;
+        min-height: 150px;
+    }
     .back { margin: 1dvh 0; padding: 10px; }
     footer { height: 60dvh; }
     .modal-window { width: 90%; padding: 1.5rem; margin: 1rem; }

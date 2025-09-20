@@ -130,7 +130,25 @@ include 'header.php';
                 <div class="tstext">
                     <h3><?php echo htmlspecialchars($story['title']); ?></h3>
                     <p><?php echo htmlspecialchars(substr($story['excerpt'], 0, 200)) . (strlen($story['excerpt']) > 200 ? '...' : ''); ?></p>
-                    <p><?php echo date('H:i', strtotime($story['published_at'])); ?> ago / by <?php echo htmlspecialchars($story['author_name']); ?></p>
+                    <p>
+                        <?php 
+                        $publishTime = strtotime($story['published_at']);
+                        $now = time();
+                        $diff = $now - $publishTime;
+                        
+                        if ($diff < 86400) { // Less than 24 hours
+                            $hours = floor($diff / 3600);
+                            if ($hours < 1) {
+                                $minutes = floor($diff / 60);
+                                echo $minutes . ' minutes ago';
+                            } else {
+                                echo $hours . ' hours ago';
+                            }
+                        } else {
+                            echo date('F j, Y', $publishTime);
+                        }
+                        ?> / by <?php echo htmlspecialchars($story['author_name']); ?> / <?php echo htmlspecialchars($story['category_name'] ?? 'Uncategorized'); ?>
+                    </p>
                 </div>
             </a>
         <?php endforeach; ?>
@@ -159,7 +177,23 @@ include 'header.php';
                                         <h3 class="carousel-item-title"><?php echo htmlspecialchars($carouselItem['title']); ?></h3>
                                         <p class="carousel-item-excerpt"><?php echo htmlspecialchars(substr($carouselItem['excerpt'], 0, 100)) . (strlen($carouselItem['excerpt']) > 100 ? '...' : ''); ?></p>
                                         <p class="carousel-item-meta">
-                                            <?php echo date('H:i', strtotime($carouselItem['published_at'])); ?> ago / by <?php echo htmlspecialchars($carouselItem['author_name']); ?>
+                                            <?php 
+                                            $publishTime = strtotime($carouselItem['published_at']);
+                                            $now = time();
+                                            $diff = $now - $publishTime;
+                                            
+                                            if ($diff < 86400) { // Less than 24 hours
+                                                $hours = floor($diff / 3600);
+                                                if ($hours < 1) {
+                                                    $minutes = floor($diff / 60);
+                                                    echo $minutes . ' minutes ago';
+                                                } else {
+                                                    echo $hours . ' hours ago';
+                                                }
+                                            } else {
+                                                echo date('F j, Y', $publishTime);
+                                            }
+                                            ?> / by <?php echo htmlspecialchars($carouselItem['author_name']); ?> / <?php echo htmlspecialchars($carouselItem['category_name'] ?? 'Uncategorized'); ?>
                                         </p>
                                     </div>
                                 </a>
@@ -200,7 +234,23 @@ include 'header.php';
                                     <p><?php echo htmlspecialchars(substr($newsItem['excerpt'], 0, 150)) . (strlen($newsItem['excerpt']) > 150 ? '...' : ''); ?></p>
                                 </div>
                                 <p class="rectp">
-                                    <?php echo date('H:i', strtotime($newsItem['published_at'])); ?> ago / by <?php echo htmlspecialchars($newsItem['author_name']); ?>
+                                    <?php 
+                                    $publishTime = strtotime($newsItem['published_at']);
+                                    $now = time();
+                                    $diff = $now - $publishTime;
+                                    
+                                    if ($diff < 86400) { // Less than 24 hours
+                                        $hours = floor($diff / 3600);
+                                        if ($hours < 1) {
+                                            $minutes = floor($diff / 60);
+                                            echo $minutes . ' minutes ago';
+                                        } else {
+                                            echo $hours . ' hours ago';
+                                        }
+                                    } else {
+                                        echo date('F j, Y', $publishTime);
+                                    }
+                                    ?> / by <?php echo htmlspecialchars($newsItem['author_name']); ?> / <?php echo htmlspecialchars($newsItem['category_name'] ?? 'Uncategorized'); ?>
                                 </p>
                             </a>
                         </div>
@@ -210,8 +260,7 @@ include 'header.php';
         </section>
     </div>
 
-    <section class="back">
-        <h1 id="back"><a href="">Back to Top</a></h1>
-    </section>
+    <!-- Back to Top Arrow Button -->
+    <button class="back-to-top" id="backToTop" title="Back to Top">↑</button>
 
 <?php include 'footer.php'; ?>
