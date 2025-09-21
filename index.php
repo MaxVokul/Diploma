@@ -11,7 +11,6 @@ define('ROOT', dirname(__FILE__));
 require_once ROOT . '/app/core/Database.php';
 require_once ROOT . '/app/models/UserModel.php';
 require_once ROOT . '/app/models/NewsModel.php'; // ← ЭТО ВАЖНО! Без этого будет ошибка!
-require_once ROOT . '/app/core/View.php';
 
 // Инициализируем модель новостей
 $newsModel = new NewsModel();
