@@ -37,7 +37,7 @@ if (isset($_SESSION['user_id'])) {
             $id = (int)$item['id'];
             if (!in_array($id, $topStoryIds, true)) {
                 $uniqueForYou[] = $item;
-                // Remove the 12 article limit to allow Load More functionality
+                // Убераем лимит в 12 статей для кнопки Load More
             }
         }
         

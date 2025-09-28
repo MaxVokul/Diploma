@@ -34,14 +34,6 @@ class Database {
         }
     }
 
-    // Запрещаем клонирование
-    private function __clone() {}
-
-    // Запрещаем восстановление
-    public function __wakeup() {
-        throw new Exception("Cannot unserialize singleton");
-    }
-
     // Получить экземпляр (Singleton)
     public static function getInstance() {
         if (self::$instance === null) {

@@ -15,20 +15,9 @@ DiplomaRECENT/
 ├── app/
 │   ├── core/
 │   │   ├── Database.php
-│   ├── models/
-│   │   ├── NewsModel.php
-│   │   └── UserModel.php
-│   └── views/
-│       ├── auth/
-│       │   ├── login.php
-│       │   └── register.php
-│       ├── home/
-│       │   └── index.php
-│       ├── logouts/
-│       │   ├── footer.php
-│       │   └── header.php
-│       └── profile/
-│           └── index.php
+│   └── models/
+│       ├── NewsModel.php
+│       └── UserModel.php
 ├── assets/
 │   ├── css/
 │   │   ├── main.css
@@ -643,13 +632,6 @@ class Database {
         }
     }
 
-    // Запрещаем клонирование
-    private function __clone() {}
-
-    // Запрещаем восстановление
-    public function __wakeup() {
-        throw new Exception("Cannot unserialize singleton");
-    }
 
     // Получить экземпляр (Singleton)
     public static function getInstance() {
@@ -755,45 +737,6 @@ class NewsModel {
         $stmt->execute();
 
         return $stmt->fetchAll();
-    }
-
-    // Получить рекомендуемые новости для пользователя
-    public function getRecommendedForUser($userId, $limit = 10) {
-        // Получаем предпочтения пользователя
-        $userModel = new UserModel();
-        $preferences = $userModel->getPreferences($userId);
-
-        if (empty($preferences['categories'])) {
-            // Если нет предпочтений, возвращаем последние новости
-            return $this->getLatest($limit);
-        }
-
-        // Формируем запрос для рекомендаций на основе предпочтений
-        $categoryIds = implode(',', array_map('intval', $preferences['categories']));
-
-        $sql = "SELECT n.*, c.name as category_name, c.slug as category_slug, 
-                u.username as author_name 
-                FROM news n 
-                JOIN categories c ON n.category_id = c.id 
-                JOIN users u ON n.author_id = u.id 
-                WHERE n.category_id IN ({$categoryIds}) AND n.is_published = 1 
-                ORDER BY n.published_at DESC 
-                LIMIT :limit";
-
-        $stmt = $this->db->getConnection()->prepare($sql);
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->execute();
-
-        $results = $stmt->fetchAll();
-
-        // Если не хватает новостей, добавляем последние
-        if (count($results) < $limit) {
-            $additionalLimit = $limit - count($results);
-            $additionalNews = $this->getLatest($additionalLimit);
-            $results = array_merge($results, $additionalNews);
-        }
-
-        return $results;
     }
 
     // Получить полную новость по ID
