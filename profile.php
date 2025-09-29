@@ -1,14 +1,14 @@
 <?php
 session_start();
 
-require_once 'header.php';
+
 require_once 'app/core/Database.php';
 require_once 'app/models/UserModel.php';
 require_once 'app/models/NewsModel.php';
 
 // Проверяем, что пользователь авторизован
 if (!isset($_SESSION['user_id'])) {
-    header('Location: /login.php');
+    header('Location: /index.php');
     exit();
 }
 
@@ -34,6 +34,7 @@ $stats['comments_posted'] = 0; // Пока нет системы коммент�
 // Получаем категории для выбора
 $newsModel = new NewsModel();
 $categories = $newsModel->getAllCategories();
+require_once 'header.php';
 ?>
 
     <!-- Profile Content -->
@@ -103,16 +104,6 @@ $categories = $newsModel->getAllCategories();
                         <input type="email" id="upd_email" name="email" value="<?php echo htmlspecialchars($userData['email']); ?>" required>
                         <button type="submit" class="btn btn-secondary">Save Changes</button>
                     </form>
-                </div>
-                <div class="setting-item">
-                    <h3>Notification Settings</h3>
-                    <p>Manage your notification preferences</p>
-                    <a href="#" class="btn btn-secondary" onclick="alert('Notification settings feature will be implemented soon!')">Notifications</a>
-                </div>
-                <div class="setting-item">
-                    <h3>Privacy Settings</h3>
-                    <p>Control your privacy options</p>
-                    <a href="#" class="btn btn-secondary" onclick="alert('Privacy settings feature will be implemented soon!')">Privacy</a>
                 </div>
             </div>
         </div>

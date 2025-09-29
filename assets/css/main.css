@@ -164,24 +164,6 @@ header{
     display: none
 }
 
-.nav ul{
-    display: flex;
-    list-style-type: none;
-    margin: 0;
-}
-.nav ul li{
-    margin: 0;
-    padding: 0 1dvw 0 1dvw;
-    border-left-style: solid;
-    border-color: var(--secondary1);
-    border-width: 2px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.nav ul li:last-child {
-    border-right-style: solid;
-}
 #panel{
     width: 100%;
 }

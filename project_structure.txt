@@ -13,6 +13,8 @@ DiplomaRECENT/
 │       ├── edit.php
 │       └── manage.php
 ├── app/
+│   ├── controller/
+│   │   ├──
 │   ├── core/
 │   │   ├── Database.php
 │   └── models/
