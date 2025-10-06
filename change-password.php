@@ -4,8 +4,9 @@ session_start();
 require_once __DIR__ . '/app/core/Database.php';
 require_once __DIR__ . '/app/models/UserModel.php';
 
+// Проверяем, что пользователь авторизован
 if (!isset($_SESSION['user_id'])) {
-    header('Location: /login.php');
+    header('Location: /index.php');
     exit();
 }
 

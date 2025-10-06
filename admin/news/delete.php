@@ -7,7 +7,7 @@ require_once '../../app/models/NewsModel.php';
 
 // Проверка авторизации и прав администратора
 if (!isset($_SESSION['user_id'])) {
-    header('Location: /login.php');
+    header('Location: /index.php');
     exit();
 }
 
