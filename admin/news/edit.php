@@ -91,7 +91,7 @@ if ($_POST) {
                 <li><a href="/admin/">Главная</a></li>
                 <li><a href="/admin/news/manage.php">Управление новостями</a></li>
                 <li><a href="/admin/news/create.php">Создать новость</a></li>
-                <li><a href="/logout.php">Выйти</a></li>
+                <li><a href="/app/controller/logout.php">Выйти</a></li>
             </ul>
         </nav>
     </aside>
@@ -108,19 +108,19 @@ if ($_POST) {
 
         <form method="POST" class="news-form">
             <div class="form-group">
-                <label for="title">Заголовок *</label>
+                <label for="title">Title *</label>
                 <input type="text" id="title" name="title" value="<?php echo htmlspecialchars($newsItem['title'] ?? ''); ?>" required>
             </div>
 
             <div class="form-group">
-                <label for="excerpt">Краткое описание</label>
+                <label for="excerpt">Short description</label>
                 <textarea id="excerpt" name="excerpt"><?php echo htmlspecialchars($newsItem['excerpt'] ?? ''); ?></textarea>
             </div>
 
             <div class="form-group">
-                <label for="category_id">Категория *</label>
+                <label for="category_id">Category *</label>
                 <select id="category_id" name="category_id" required>
-                    <option value="">Выберите категорию</option>
+                    <option value="">Choose category</option>
                     <?php foreach($categories as $cat): ?>
                         <option value="<?php echo $cat['id']; ?>" <?php echo ($newsItem['category_id'] == $cat['id'] ? 'selected' : ''); ?>>
                             <?php echo htmlspecialchars($cat['name']); ?>
@@ -130,17 +130,17 @@ if ($_POST) {
             </div>
 
             <div class="form-group">
-                <label for="content">Текст новости *</label>
+                <label for="content">News text *</label>
                 <textarea id="content" name="content" required><?php echo htmlspecialchars($newsItem['content'] ?? ''); ?></textarea>
             </div>
 
             <div class="form-group">
-                <label for="image_url">URL изображения или путь к файлу</label>
+                <label for="image_url">Img URL or path to file </label>
                 <input type="text" id="image_url" name="image_url" value="<?php echo htmlspecialchars($newsItem['image_url'] ?? ''); ?>">
             </div>
 
             <div class="form-group">
-                <label for="published_at">Дата публикации</label>
+                <label for="published_at">Date of publication</label>
                 <input type="datetime-local" id="published_at" name="published_at" value="<?php echo htmlspecialchars(date('Y-m-d\TH:i', strtotime($newsItem['published_at']))); ?>">
             </div>
 
@@ -151,11 +151,11 @@ if ($_POST) {
                 </label>
             </div>
 
-            <button type="submit" class="btn-submit">Обновить новость</button>
+            <button type="submit" class="btn-submit">Update news</button>
         </form>
 
         <hr>
-        <a href="/admin/news/manage.php" class="btn-submit" style="background-color: #6c757d; text-decoration: none; display: inline-block;">← Назад к списку</a>
+        <a href="/admin/news/manage.php" class="btn-submit" style="background-color: #6c757d; text-decoration: none; display: inline-block;">← Back to the list</a>
     </main>
 </div>
 

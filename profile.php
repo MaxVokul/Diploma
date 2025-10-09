@@ -84,7 +84,7 @@ require_once 'header.php';
                 <div class="setting-item">
                     <h3>Change Password</h3>
                     <p>Update your account password</p>
-                    <form action="/change-password.php" method="POST" class="form form-vertical">
+                    <form action="/app/controller/change-password.php" method="POST" class="form form-vertical">
                         <label for="current_password">Current password</label>
                         <input type="password" id="current_password" name="current_password" required>
                         <label for="new_password">New password</label>
@@ -97,7 +97,7 @@ require_once 'header.php';
                 <div class="setting-item">
                     <h3>Update Profile</h3>
                     <p>Edit your personal information</p>
-                    <form action="/update-profile.php" method="POST" class="form form-vertical">
+                    <form action="/app/controller/update-profile.php" method="POST" class="form form-vertical">
                         <label for="upd_username">Username</label>
                         <input type="text" id="upd_username" name="username" value="<?php echo htmlspecialchars($userData['username']); ?>" required>
                         <label for="upd_email">Email</label>
@@ -124,7 +124,7 @@ require_once 'header.php';
                         <p>No reading history yet. Start reading articles to build your interests!</p>
                     <?php endif; ?>
                 </div>
-                <form id="preferences-form" method="POST" action="/update-preferences.php">
+                <form id="preferences-form" method="POST" action="/app/controller/update-preferences.php">
                     <div class="category-preferences">
                         <?php foreach($categories as $category): ?>
                             <label class="preference-item">
@@ -140,7 +140,7 @@ require_once 'header.php';
         </div>
 
         <div class="profile-actions">
-            <a href="/logout.php" class="btn btn-logout">Logout</a>
+            <a href="/app/controller/logout.php" class="btn btn-logout">Logout</a>
             <a href="#" class="btn btn-delete" onclick="alert('Delete account feature will be implemented soon!')">Delete Account</a>
         </div>
         

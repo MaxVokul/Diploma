@@ -29,7 +29,7 @@ $totalCategories = count($categories);
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Админ-панель - NEWS</title>
+    <title>Admin-panel - NEWS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" media="(min-width: 570px)" href="/assets/css/main.css">
     <link rel="stylesheet" media="(max-width: 570px)" href="/assets/css/mobile.css">
@@ -41,33 +41,33 @@ $totalCategories = count($categories);
 
 <div class="admin-container">
     <aside class="admin-sidebar">
-        <h2>Админ-панель</h2>
+        <h2>Admin-panel</h2>
         <nav>
             <ul>
-                <li><a href="/admin/">Главная</a></li>
-                <li><a href="/admin/news/manage.php">Управление новостями</a></li>
-                <li><a href="/admin/news/create.php">Создать новость</a></li>
-                <li><a href="/logout.php">Выйти</a></li>
+                <li><a href="/admin/">Main</a></li>
+                <li><a href="/admin/news/manage.php">News control</a></li>
+                <li><a href="/admin/news/create.php">Create news</a></li>
+                <li><a href="/app/controller/logout.php">Exit</a></li>
             </ul>
         </nav>
     </aside>
 
     <main class="admin-main">
-        <h1>Добро пожаловать, администратор!</h1>
-        <p>Вы можете управлять новостями и категориями.</p>
+        <h1>Welcome, Admin!</h1>
+        <p>You can control news and categories.</p>
 
         <div class="admin-stats">
             <div class="stat-card">
-                <h3>Всего новостей</h3>
+                <h3>Total news amount</h3>
                 <p><?php echo $totalNews; ?></p>
             </div>
             <div class="stat-card">
-                <h3>Категорий</h3>
+                <h3>Categories</h3>
                 <p><?php echo $totalCategories; ?></p>
             </div>
         </div>
 
-        <h2>Категории</h2>
+        <h2>Categories</h2>
         <ul class="category-list">
             <?php foreach($categories as $cat): ?>
                 <li>
@@ -78,10 +78,10 @@ $totalCategories = count($categories);
             <?php endforeach; ?>
         </ul>
 
-        <h2>Быстрые действия</h2>
+        <h2>Quick action</h2>
         <ul>
-            <li><a href="/admin/news/create.php">Создать новую новость</a></li>
-            <li><a href="/admin/news/manage.php">Просмотреть все новости</a></li>
+            <li><a href="/admin/news/create.php">Create new news</a></li>
+            <li><a href="/admin/news/manage.php">View all news</a></li>
         </ul>
     </main>
 </div>

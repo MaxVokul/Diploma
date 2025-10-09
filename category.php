@@ -22,12 +22,12 @@ if (!$categoryInfo) {
     die('Категория не найдена');
 }
 
-// Pagination settings
+// Настройки пагинации
 $articlesPerPage = 10;
 $currentPage = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $offset = ($currentPage - 1) * $articlesPerPage;
 
-// Get total count and articles for current page
+// Получить общее количество и статьи для данной страницы
 $totalArticles = $newsModel->getCategoryCount($categoryInfo['id']);
 $totalPages = ceil($totalArticles / $articlesPerPage);
 $categoryNews = $newsModel->getByCategory($categoryInfo['id'], $articlesPerPage, $offset);

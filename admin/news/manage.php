@@ -49,7 +49,7 @@ $totalPages = ceil($totalArticles / $articlesPerPage);
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Управление новостями - NEWS</title>
+    <title>News control - NEWS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" media="(min-width: 570px)" href="/assets/css/main.css">
     <link rel="stylesheet" media="(max-width: 570px)" href="/assets/css/mobile.css">
@@ -62,27 +62,27 @@ $totalPages = ceil($totalArticles / $articlesPerPage);
 <div class="admin-container">
     <!-- Сайдбар из dashboard.php можно вынести в отдельный файл и подключать -->
     <aside class="admin-sidebar">
-        <h2>Админ-панель</h2>
+        <h2>Admin-panel</h2>
         <nav>
             <ul>
-                <li><a href="/admin/">Главная</a></li>
-                <li><a href="/admin/news/manage.php">Управление новостями</a></li>
-                <li><a href="/admin/news/create.php">Создать новость</a></li>
-                <li><a href="/logout.php">Выйти</a></li>
+                <li><a href="/admin/">Main</a></li>
+                <li><a href="/admin/news/manage.php">News control</a></li>
+                <li><a href="/admin/news/create.php">Create news</a></li>
+                <li><a href="/app/controller/logout.php">Exit</a></li>
             </ul>
         </nav>
     </aside>
 
     <main class="admin-main">
-        <h1>Управление новостями</h1>
+        <h1>News control</h1>
         
         <div class="admin-controls">
-            <a href="/admin/news/create.php" class="btn-create">Создать новость</a>
+            <a href="/admin/news/create.php" class="btn-create">Create news</a>
             
             <form method="GET" class="search-form">
                 <div class="search-input-group">
                     <input type="text" name="search" value="<?php echo htmlspecialchars($searchTerm); ?>" 
-                           placeholder="Поиск по заголовку, содержанию, автору или категории..." 
+                           placeholder="Search by title, content, author, or category..."
                            class="search-input">
                     <button type="submit" class="search-btn">🔍</button>
                     <?php if ($isSearching): ?>
@@ -98,17 +98,17 @@ $totalPages = ceil($totalArticles / $articlesPerPage);
         <?php if (empty($allNews)): ?>
             <?php if ($isSearching): ?>
                 <div class="no-results">
-                    <p>По запросу "<?php echo htmlspecialchars($searchTerm); ?>" ничего не найдено.</p>
-                    <a href="?" class="btn-clear-search">Показать все новости</a>
+                    <p>Nothing found on the search query - "<?php echo htmlspecialchars($searchTerm); ?>".</p>
+                    <a href="?" class="btn-clear-search">Show all news</a>
                 </div>
             <?php else: ?>
-                <p>Новостей пока нет.</p>
+                <p>No news yet.</p>
             <?php endif; ?>
         <?php else: ?>
             <div class="admin-info">
                 <?php if ($isSearching): ?>
-                    <p>Найдено <?php echo $totalArticles; ?> результатов по запросу "<?php echo htmlspecialchars($searchTerm); ?>" 
-                       (Показано <?php echo count($allNews); ?> из <?php echo $totalArticles; ?>, Страница <?php echo $currentPage; ?> из <?php echo $totalPages; ?>)</p>
+                    <p>Найдено <?php echo $totalArticles; ?> Search result "<?php echo htmlspecialchars($searchTerm); ?>"
+                       (Showing <?php echo count($allNews); ?> of  <?php echo $totalArticles; ?>, Page <?php echo $currentPage; ?> of <?php echo $totalPages; ?>)</p>
                 <?php else: ?>
                     <p>Showing <?php echo count($allNews); ?> of <?php echo $totalArticles; ?> articles (Page <?php echo $currentPage; ?> of <?php echo $totalPages; ?>)</p>
                 <?php endif; ?>
@@ -124,30 +124,30 @@ $totalPages = ceil($totalArticles / $articlesPerPage);
                     </th>
                     <th>
                         <a href="?sort=title&order=<?php echo ($sortBy == 'title' && $sortOrder == 'ASC') ? 'DESC' : 'ASC'; ?>&page=<?php echo $currentPage; ?><?php echo $isSearching ? '&search=' . urlencode($searchTerm) : ''; ?>">
-                            Заголовок <?php echo ($sortBy == 'title') ? ($sortOrder == 'ASC' ? '↑' : '↓') : ''; ?>
+                            Title <?php echo ($sortBy == 'title') ? ($sortOrder == 'ASC' ? '↑' : '↓') : ''; ?>
                         </a>
                     </th>
                     <th>
                         <a href="?sort=category_name&order=<?php echo ($sortBy == 'category_name' && $sortOrder == 'ASC') ? 'DESC' : 'ASC'; ?>&page=<?php echo $currentPage; ?><?php echo $isSearching ? '&search=' . urlencode($searchTerm) : ''; ?>">
-                            Категория <?php echo ($sortBy == 'category_name') ? ($sortOrder == 'ASC' ? '↑' : '↓') : ''; ?>
+                            Category <?php echo ($sortBy == 'category_name') ? ($sortOrder == 'ASC' ? '↑' : '↓') : ''; ?>
                         </a>
                     </th>
                     <th>
                         <a href="?sort=author_name&order=<?php echo ($sortBy == 'author_name' && $sortOrder == 'ASC') ? 'DESC' : 'ASC'; ?>&page=<?php echo $currentPage; ?><?php echo $isSearching ? '&search=' . urlencode($searchTerm) : ''; ?>">
-                            Автор <?php echo ($sortBy == 'author_name') ? ($sortOrder == 'ASC' ? '↑' : '↓') : ''; ?>
+                            Author <?php echo ($sortBy == 'author_name') ? ($sortOrder == 'ASC' ? '↑' : '↓') : ''; ?>
                         </a>
                     </th>
                     <th>
                         <a href="?sort=published_at&order=<?php echo ($sortBy == 'published_at' && $sortOrder == 'ASC') ? 'DESC' : 'ASC'; ?>&page=<?php echo $currentPage; ?><?php echo $isSearching ? '&search=' . urlencode($searchTerm) : ''; ?>">
-                            Дата <?php echo ($sortBy == 'published_at') ? ($sortOrder == 'ASC' ? '↑' : '↓') : ''; ?>
+                            Date <?php echo ($sortBy == 'published_at') ? ($sortOrder == 'ASC' ? '↑' : '↓') : ''; ?>
                         </a>
                     </th>
                     <th>
                         <a href="?sort=is_published&order=<?php echo ($sortBy == 'is_published' && $sortOrder == 'ASC') ? 'DESC' : 'ASC'; ?>&page=<?php echo $currentPage; ?><?php echo $isSearching ? '&search=' . urlencode($searchTerm) : ''; ?>">
-                            Статус <?php echo ($sortBy == 'is_published') ? ($sortOrder == 'ASC' ? '↑' : '↓') : ''; ?>
+                            Status <?php echo ($sortBy == 'is_published') ? ($sortOrder == 'ASC' ? '↑' : '↓') : ''; ?>
                         </a>
                     </th>
-                    <th>Действия</th>
+                    <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -162,10 +162,10 @@ $totalPages = ceil($totalArticles / $articlesPerPage);
                         <td><?php echo htmlspecialchars($newsItem['category_name']); ?></td>
                         <td><?php echo htmlspecialchars($newsItem['author_name']); ?></td>
                         <td><?php echo date('d.m.Y H:i', strtotime($newsItem['published_at'])); ?></td>
-                        <td><?php echo $newsItem['is_published'] ? '<span style="color:green;">Опубликовано</span>' : '<span style="color:orange;">Черновик</span>'; ?></td>
+                        <td><?php echo $newsItem['is_published'] ? '<span style="color:green;">Published</span>' : '<span style="color:orange;">Draft</span>'; ?></td>
                         <td class="actions">
-                            <a href="/admin/news/edit.php?id=<?php echo $newsItem['id']; ?>">Редактировать</a>
-                            <a href="/admin/news/delete.php?id=<?php echo $newsItem['id']; ?>" onclick="return confirm('Вы уверены, что хотите удалить эту новость?')">Удалить</a>
+                            <a href="/admin/news/edit.php?id=<?php echo $newsItem['id']; ?>">Edit</a>
+                            <a href="/admin/news/delete.php?id=<?php echo $newsItem['id']; ?>" onclick="return confirm('Вы уверены, что хотите удалить эту новость?')">Delete</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

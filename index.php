@@ -10,7 +10,7 @@ define('ROOT', dirname(__FILE__));
 // Подключаем базовые файлы
 require_once ROOT . '/app/core/Database.php';
 require_once ROOT . '/app/models/UserModel.php';
-require_once ROOT . '/app/models/NewsModel.php'; // ← ЭТО ВАЖНО! Без этого будет ошибка!
+require_once ROOT . '/app/models/NewsModel.php';
 
 // Инициализируем модель новостей
 $newsModel = new NewsModel();

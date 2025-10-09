@@ -76,13 +76,13 @@ if ($_POST) {
 
 <div class="admin-container">
     <aside class="admin-sidebar">
-        <h2>Админ-панель</h2>
+        <h2>Admin-panel</h2>
         <nav>
             <ul>
-                <li><a href="/admin/">Главная</a></li>
-                <li><a href="/admin/news/manage.php">Управление новостями</a></li>
-                <li><a href="/admin/news/create.php">Создать новость</a></li>
-                <li><a href="/logout.php">Выйти</a></li>
+                <li><a href="/admin/">Main</a></li>
+                <li><a href="/admin/news/manage.php">News control</a></li>
+                <li><a href="/admin/news/create.php">Create news</a></li>
+                <li><a href="/app/controller/logout.php">Exit</a></li>
             </ul>
         </nav>
     </aside>
@@ -99,19 +99,19 @@ if ($_POST) {
 
         <form method="POST" class="news-form">
             <div class="form-group">
-                <label for="title">Заголовок *</label>
+                <label for="title">Title *</label>
                 <input type="text" id="title" name="title" value="<?php echo htmlspecialchars($_POST['title'] ?? ''); ?>" required>
             </div>
 
             <div class="form-group">
-                <label for="excerpt">Краткое описание</label>
+                <label for="excerpt">Short description</label>
                 <textarea id="excerpt" name="excerpt"><?php echo htmlspecialchars($_POST['excerpt'] ?? ''); ?></textarea>
             </div>
 
             <div class="form-group">
-                <label for="category_id">Категория *</label>
+                <label for="category_id">Category *</label>
                 <select id="category_id" name="category_id" required>
-                    <option value="">Выберите категорию</option>
+                    <option value="">Choose category</option>
                     <?php foreach($categories as $cat): ?>
                         <option value="<?php echo $cat['id']; ?>" <?php echo (($_POST['category_id'] ?? '') == $cat['id'] ? 'selected' : ''); ?>>
                             <?php echo htmlspecialchars($cat['name']); ?>
@@ -121,28 +121,28 @@ if ($_POST) {
             </div>
 
             <div class="form-group">
-                <label for="content">Текст новости *</label>
+                <label for="content">News text *</label>
                 <textarea id="content" name="content" required><?php echo htmlspecialchars($_POST['content'] ?? ''); ?></textarea>
             </div>
 
             <div class="form-group">
-                <label for="image_input">URL изображения или путь к файлу</label>
+                <label for="image_input">Img URL or path to file </label>
                 <input type="text" id="image_input" name="image_input" value="<?php echo htmlspecialchars($_POST['image_url'] ?? $_POST['image_input'] ?? ''); ?>" placeholder="Введите URL или путь к файлу">
             </div>
 
             <div class="form-group">
-                <label for="published_at">Дата публикации</label>
+                <label for="published_at">Date of publication</label>
                 <input type="datetime-local" id="published_at" name="published_at" value="<?php echo htmlspecialchars($_POST['published_at'] ?? date('Y-m-d\TH:i')); ?>">
             </div>
 
             <div class="form-group">
                 <label>
                     <input type="checkbox" name="is_published" value="1" <?php echo (isset($_POST['is_published']) && $_POST['is_published']) ? 'checked' : ''; ?>>
-                    Опубликовано
+                    Published
                 </label>
             </div>
 
-            <button type="submit" class="btn-submit">Создать новость</button>
+            <button type="submit" class="btn-submit">Create news</button>
         </form>
     </main>
 </div>

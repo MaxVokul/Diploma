@@ -217,7 +217,7 @@ try {
         <button class="toggle-btn" data-tab="register">Register</button>
     </div>
     <!-- Login Form -->
-    <form class="modal__form login-form" style="display: flex;" action="/login-process.php" method="POST">
+    <form class="modal__form login-form" style="display: flex;" action="/app/controller/login-process.php" method="POST">
         <label for="login-email">Email</label>
         <input type="email" id="login-email" name="email" placeholder="Enter your email" required>
         <label for="login-password">Password</label>
@@ -225,7 +225,7 @@ try {
         <button type="submit" class="btn">Login →</button>
     </form>
     <!-- Register Form -->
-    <form class="modal__form register-form" style="display: none;" action="/register-process.php" method="POST">
+    <form class="modal__form register-form" style="display: none;" action="/app/controller/register-process.php" method="POST">
         <label for="register-name">Full Name</label>
         <input type="text" id="register-name" name="name" placeholder="Enter your full name" required>
         <label for="register-email">Email</label>
