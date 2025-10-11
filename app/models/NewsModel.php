@@ -11,14 +11,20 @@ class NewsModel {
     public function getLatest($limit = 10, $offset = 0) {
         $sql = "SELECT n.*, c.name as category_name, c.slug as category_slug, 
                 u.username as author_name 
-                FROM news n 
+                FROM news n
                 JOIN categories c ON n.category_id = c.id 
                 JOIN users u ON n.author_id = u.id 
                 WHERE n.is_published = 1 
                 ORDER BY n.published_at DESC 
                 LIMIT :limit OFFSET :offset";
 
+        //РЕЗУЛЬТАТ JOIN (соединения 3-х таблиц news, categories и users):
+        //n.id | n.title | c.name     | c.slug    | u.username
+        //1    | Новость1| Politics   | politics  | maks
+        //2    | Новость2| Technology | technology| keny
+
         $stmt = $this->db->getConnection()->prepare($sql);
+        //Присвоение плейсхолдеров, защита от SQL инъекций
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();

@@ -3,26 +3,17 @@
 class Database {
     private static $instance = null;
     private $pdo;
-    private $host;
-    private $dbname;
-    private $username;
-    private $password;
 
     private function __construct() {
 
         // Подключаем конфиг
         require_once __DIR__ . '/../../config/database.php';
 
-        $this->host = DB_HOST;
-        $this->dbname = DB_NAME;
-        $this->username = DB_USER;
-        $this->password = DB_PASS;
-
         try {
             $this->pdo = new PDO(
-                "mysql:host={$this->host};dbname={$this->dbname};charset=utf8",
-                $this->username,
-                $this->password,
+                "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8",
+                DB_USER,
+                DB_PASS,
                 [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -37,7 +28,7 @@ class Database {
     // Получить экземпляр (Singleton)
     public static function getInstance() {
         if (self::$instance === null) {
-            self::$instance = new self();
+            self::$instance = new self(); //-вызов конструктора
         }
         return self::$instance;
     }
@@ -47,7 +38,7 @@ class Database {
         return $this->pdo;
     }
 
-    // Выполнить запрос SELECT
+    // Выполнить запрос SELECT - возращает массив всех строк результата
     public function query($sql, $params = []) {
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);

@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const overlay = document.querySelector('.overlay');
     const closeModalBtn = document.querySelector('.btn--close-modal-window');
 
-    // 🔴 УБРАЛИ: const showModalBtns = ... и весь связанный код!
 
     // Функция переключения форм
     function switchForm(tabName) {
@@ -26,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // 🔴 ОБНОВЛЕННАЯ ФУНКЦИЯ openModal — теперь она используется ТОЛЬКО через profileLink
+
     function openModal() {
         if (modalWindow) modalWindow.classList.remove('hidden');
         if (overlay) overlay.classList.remove('hidden');
