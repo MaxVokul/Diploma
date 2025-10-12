@@ -23,8 +23,8 @@ class NewsModel {
         //1    | Новость1| Politics   | politics  | maks
         //2    | Новость2| Technology | technology| keny
 
+        //Присвоение плейсхолдеров, защита от SQL инъекций:
         $stmt = $this->db->getConnection()->prepare($sql);
-        //Присвоение плейсхолдеров, защита от SQL инъекций
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
@@ -42,7 +42,10 @@ class NewsModel {
                 WHERE n.category_id = :category_id AND n.is_published = 1 
                 ORDER BY n.published_at DESC 
                 LIMIT :limit OFFSET :offset";
+        //все новости категории X, которые опубликованы,
+        //вместе с названием категории и именем автора, отсортированные от новых к старым, покажи только N штук начиная с позиции M"
 
+        //Присвоение плейсхолдеров, защита от SQL инъекций:
         $stmt = $this->db->getConnection()->prepare($sql);
         $stmt->bindValue(':category_id', $categoryId, PDO::PARAM_INT);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
@@ -52,29 +55,30 @@ class NewsModel {
         return $stmt->fetchAll();
     }
 
-    // Получить новости по ключевому слову
-    public function search($keyword, $limit = 10, $offset = 0) {
-        $sql = "SELECT n.*, c.name as category_name, c.slug as category_slug, 
-                u.username as author_name 
-                FROM news n 
-                JOIN categories c ON n.category_id = c.id 
-                JOIN users u ON n.author_id = u.id 
-                WHERE (n.title LIKE :keyword OR n.content LIKE :keyword) 
-                AND n.is_published = 1 
-                ORDER BY n.published_at DESC 
-                LIMIT :limit OFFSET :offset";
+//    // Получить новости по ключевому слову
+//    public function search($keyword, $limit = 10, $offset = 0) {
+//        $sql = "SELECT n.*, c.name as category_name, c.slug as category_slug,
+//                u.username as author_name
+//                FROM news n
+//                JOIN categories c ON n.category_id = c.id
+//                JOIN users u ON n.author_id = u.id
+//                WHERE (n.title LIKE :keyword OR n.content LIKE :keyword)
+//                AND n.is_published = 1
+//                ORDER BY n.published_at DESC
+//                LIMIT :limit OFFSET :offset";
+//
+//        //Присвоение плейсхолдеров, защита от SQL инъекций:
+//        $stmt = $this->db->getConnection()->prepare($sql);
+//        $stmt->bindValue(':keyword', "%{$keyword}%", PDO::PARAM_STR);
+//        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+//        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+//        $stmt->execute();
+//
+//        return $stmt->fetchAll();
+//    }
 
-        $stmt = $this->db->getConnection()->prepare($sql);
-        $stmt->bindValue(':keyword', "%{$keyword}%", PDO::PARAM_STR);
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-        $stmt->execute();
 
-        return $stmt->fetchAll();
-    }
-
-
-    // Увеличить счетчик просмотров
+    // Увеличить счетчик просмотров - используется при каждом открытии страницы новости
     public function incrementViews($id) {
         $sql = "UPDATE news SET views = views + 1 WHERE id = :id";
         return $this->db->execute($sql, ['id' => $id]);
@@ -85,6 +89,7 @@ class NewsModel {
         $sql = "SELECT * FROM categories ORDER BY name ASC";
         return $this->db->query($sql);
     }
+
     // Создать новость
     public function create($data) {
         $sql = "INSERT INTO `news` (`title`, `content`, `excerpt`, `category_id`, `author_id`, `published_at`, `is_published`, `image_url`) 

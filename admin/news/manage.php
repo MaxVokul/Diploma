@@ -60,7 +60,7 @@ $totalPages = ceil($totalArticles / $articlesPerPage);
 <?php include '../../header.php'; ?>
 
 <div class="admin-container">
-    <!-- Сайдбар из dashboard.php можно вынести в отдельный файл и подключать -->
+
     <aside class="admin-sidebar">
         <h2>Admin-panel</h2>
         <nav>
