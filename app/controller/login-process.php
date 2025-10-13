@@ -1,8 +1,8 @@
 <?php
 session_start();
 
-require_once 'app/core/Database.php';
-require_once 'app/models/UserModel.php';
+require_once __DIR__ . '/../core/Database.php';
+require_once __DIR__ . '/../models/UserModel.php';
 
 $email = trim($_POST['email'] ?? '');
 $password = $_POST['password'] ?? '';

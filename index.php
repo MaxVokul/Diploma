@@ -17,7 +17,7 @@ $newsModel = new NewsModel();
 
 // Получаем последние новости для главной страницы
 $topStories = $newsModel->getLatest(3);
-$topStoryIds = array_map(function($s){ return (int)$s['id']; }, $topStories);
+$topStoryIds = array_map(function($s){ return (int)$s['id']; }, $topStories);//-id только топ новостей - для проверки в топе ли новость уже?
 $forYouNews = [];
 $forYouHeadline = 'For You';
 $forYouSubtitle = 'Recommended based on your interests';
@@ -34,15 +34,15 @@ if (isset($_SESSION['user_id'])) {
         // Фильтруем только уникальные статьи (исключая топ-сториз)
         $uniqueForYou = [];
         foreach ($categoryNews as $item) {
-            $id = (int)$item['id'];
+            $id = (int)$item['id'];//-целое число;
             if (!in_array($id, $topStoryIds, true)) {
                 $uniqueForYou[] = $item;
-                // Убераем лимит в 12 статей для кнопки Load More
+
             }
         }
         
         // Если не хватает статей из топ-категории, дополняем из других категорий
-        if (count($uniqueForYou) < 50) { // Increased from 12 to 50 for better Load More experience
+        if (count($uniqueForYou) < 50) {
             $additionalNews = $newsModel->getLatest(100);
             shuffle($additionalNews);
             $usedIds = array_merge($topStoryIds, array_map(function($item){ return (int)$item['id']; }, $uniqueForYou));
@@ -68,7 +68,6 @@ if (isset($_SESSION['user_id'])) {
             $id = (int)$item['id'];
             if (!in_array($id, $topStoryIds, true)) {
                 $uniqueForYou[] = $item;
-                // Remove the 12 article limit to allow Load More functionality
             }
         }
         $forYouNews = $uniqueForYou;
@@ -84,7 +83,7 @@ if (isset($_SESSION['user_id'])) {
         $id = (int)$item['id'];
         if (!in_array($id, $topStoryIds, true)) {
             $uniqueForYou[] = $item;
-            // Remove the 12 article limit to allow Load More functionality
+
         }
     }
     $forYouNews = $uniqueForYou;
@@ -115,6 +114,7 @@ $categories = $newsModel->getAllCategories();
 
 // Получаем текущего пользователя
 $userModel = new UserModel();
+//Тернарный оператор: $переменная = условие ? значение_если_истина : значение_если_ложь;
 $current_user = isset($_SESSION['user_id']) ? $userModel->findById($_SESSION['user_id']) : null;
 
 // Передаем данные в представление
@@ -221,7 +221,7 @@ include 'header.php';
     <div class="foryouall">
         <section class="foryouin" id="foryouSection">
             <?php 
-            // Show only first 4 rows initially (12 articles)
+            // Показывает 12 новостей (4 ряда)
             $initialRows = min(4, ceil(count($forYouNews) / 3));
             $rowIndex = 0; 
             ?>
@@ -285,7 +285,7 @@ include 'header.php';
     <!-- Back to Top Arrow Button -->
     <button class="back-to-top" id="backToTop" title="Back to Top">↑</button>
 
-    <!-- Pass PHP data to JavaScript -->
+    <!-- Pass PHP data to JavaScript - Все 50+ статей уже загружены в PHP, но скрыты. JavaScript будет показывать их по клику без запросов к серверу -->
     <script>
         window.forYouNewsData = <?php echo json_encode($forYouNews); ?>;
     </script>

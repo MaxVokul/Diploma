@@ -2,8 +2,8 @@
 session_start();
 
 // Подключаем базу данных и модель пользователя
-require_once 'app/core/Database.php';
-require_once 'app/models/UserModel.php';
+require_once __DIR__ . '/../core/Database.php';
+require_once __DIR__ . '/../models/UserModel.php';
 
 // Получаем данные формы
 $name = trim($_POST['name'] ?? '');
