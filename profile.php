@@ -124,18 +124,6 @@ require_once 'header.php';
                         <p>No reading history yet. Start reading articles to build your interests!</p>
                     <?php endif; ?>
                 </div>
-                <form id="preferences-form" method="POST" action="/app/controller/update-preferences.php">
-                    <div class="category-preferences">
-                        <?php foreach($categories as $category): ?>
-                            <label class="preference-item">
-                                <input type="checkbox" name="categories[]" value="<?php echo htmlspecialchars($category['slug']); ?>"
-                                    <?php echo in_array($category['slug'], $preferences['categories']) ? 'checked' : ''; ?>>
-                                <span><?php echo htmlspecialchars($category['name']); ?></span>
-                            </label>
-                        <?php endforeach; ?>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Update Interests</button>
-                </form>
             </div>
         </div>
 
