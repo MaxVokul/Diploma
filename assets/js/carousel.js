@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function nextSlide() {
         currentIndex++;
         if (currentIndex >= totalItems) {
-            currentIndex = 0;
+            currentIndex = 0;// Возврат к началу
         }
         updateCarousel();
     }
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function prevSlide() {
         currentIndex--;
         if (currentIndex < 0) {
-            currentIndex = totalItems - 1;
+            currentIndex = totalItems - 1;// Переход к концу
         }
         updateCarousel();
     }

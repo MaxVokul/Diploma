@@ -21,8 +21,8 @@ if (!$userModel->isAdmin($_SESSION['user_id'])) {
 $newsModel = new NewsModel();
 
 // Search settings
-$searchTerm = trim($_GET['search'] ?? '');
-$isSearching = !empty($searchTerm);
+$searchTerm = trim($_GET['search'] ?? '');// - Возьми значение $_GET['search'], но если его нет или оно равно null, то используй '' (пустую строку)
+$isSearching = !empty($searchTerm);// - true если идет поиск, false если нет
 
 // Pagination settings
 $articlesPerPage = 50;
