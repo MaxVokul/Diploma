@@ -48,6 +48,9 @@ if (isset($_POST['import_news'])) {
             $importedCount = 0;
             $errors = [];
 
+            // Получаем ID категории на основе выбора пользователя
+            $selectedCategoryId = getCategoryIdFromApiCategory($category, $categories);
+
             foreach ($data['articles'] as $article) {
                 // Пропускаем статьи без заголовка
                 if (empty($article['title'])) {
@@ -56,9 +59,6 @@ if (isset($_POST['import_news'])) {
 
                 // Проверяем, существует ли уже такая новость по заголовку
                 if (!$newsModel->existsByTitle($article['title'])) {
-                    // Сопоставляем категорию API с нашей категорией
-                    $categoryId = mapApiCategoryToLocal($article, $categories);
-
                     // Подготавливаем данные
                     $content = !empty($article['content']) ? $article['content'] :
                         (!empty($article['description']) ? $article['description'] : $article['title']);
@@ -74,7 +74,7 @@ if (isset($_POST['import_news'])) {
                         'title' => $article['title'],
                         'content' => $content,
                         'excerpt' => $excerpt,
-                        'category_id' => $categoryId,
+                        'category_id' => $selectedCategoryId, // Используем выбранную категорию
                         'author_id' => $_SESSION['user_id'],
                         'published_at' => $publishedAt,
                         'is_published' => 1,
@@ -90,7 +90,8 @@ if (isset($_POST['import_news'])) {
             }
 
             if ($importedCount > 0) {
-                $success = "Успешно импортировано $importedCount новостей из GNews API!";
+                $categoryName = getCategoryNameById($selectedCategoryId, $categories);
+                $success = "Успешно импортировано $importedCount новостей в категорию '$categoryName' из GNews API!";
                 if (!empty($errors)) {
                     $success .= " Ошибки: " . count($errors);
                 }
@@ -114,9 +115,9 @@ if (isset($_POST['import_news'])) {
     }
 }
 
-// Функция для сопоставления категорий API с нашими категориями
-function mapApiCategoryToLocal($article, $categories) {
-    $apiCategories = [
+// Функция для получения ID категории на основе выбора в API
+function getCategoryIdFromApiCategory($apiCategory, $categories) {
+    $categoryMapping = [
         'general' => 'General',
         'world' => 'World',
         'nation' => 'Politics',
@@ -128,26 +129,28 @@ function mapApiCategoryToLocal($article, $categories) {
         'health' => 'Health'
     ];
 
-    // По умолчанию используем категорию "World"
-    $defaultCategoryId = 2;
+    // Находим название категории по ключу API
+    $targetCategoryName = $categoryMapping[$apiCategory] ?? 'World';
 
-    // Пытаемся определить категорию из данных API
-    $apiCategory = null;
-    if (isset($article['category'])) {
-        $apiCategory = $article['category'];
-    }
-
-    // Если категория определена, ищем соответствие
-    if ($apiCategory && isset($apiCategories[$apiCategory])) {
-        $targetCategoryName = $apiCategories[$apiCategory];
-        foreach ($categories as $category) {
-            if (strtolower($category['name']) === strtolower($targetCategoryName)) {
-                return $category['id'];
-            }
+    // Ищем соответствующую категорию в нашей базе
+    foreach ($categories as $category) {
+        if (strtolower($category['name']) === strtolower($targetCategoryName)) {
+            return $category['id'];
         }
     }
 
-    return $defaultCategoryId;
+    // Если не нашли, возвращаем World по умолчанию
+    return 2; // ID для World
+}
+
+// Функция для получения названия категории по ID
+function getCategoryNameById($categoryId, $categories) {
+    foreach ($categories as $category) {
+        if ($category['id'] == $categoryId) {
+            return $category['name'];
+        }
+    }
+    return 'World';
 }
 
 ?>
