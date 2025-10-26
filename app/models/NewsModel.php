@@ -55,27 +55,37 @@ class NewsModel {
         return $stmt->fetchAll();
     }
 
-//    // Получить новости по ключевому слову
-//    public function search($keyword, $limit = 10, $offset = 0) {
-//        $sql = "SELECT n.*, c.name as category_name, c.slug as category_slug,
-//                u.username as author_name
-//                FROM news n
-//                JOIN categories c ON n.category_id = c.id
-//                JOIN users u ON n.author_id = u.id
-//                WHERE (n.title LIKE :keyword OR n.content LIKE :keyword)
-//                AND n.is_published = 1
-//                ORDER BY n.published_at DESC
-//                LIMIT :limit OFFSET :offset";
-//
-//        //Присвоение плейсхолдеров, защита от SQL инъекций:
-//        $stmt = $this->db->getConnection()->prepare($sql);
-//        $stmt->bindValue(':keyword', "%{$keyword}%", PDO::PARAM_STR);
-//        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-//        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-//        $stmt->execute();
-//
-//        return $stmt->fetchAll();
-//    }
+    // Получить новости по ключевому слову
+    public function search($keyword, $limit = 10, $offset = 0) {
+        $sql = "SELECT n.*, c.name as category_name, c.slug as category_slug, 
+            u.username as author_name 
+            FROM news n 
+            JOIN categories c ON n.category_id = c.id 
+            JOIN users u ON n.author_id = u.id 
+            WHERE (n.title LIKE :keyword OR n.content LIKE :keyword) 
+            AND n.is_published = 1 
+            ORDER BY n.published_at DESC 
+            LIMIT :limit OFFSET :offset";
+
+        $stmt = $this->db->getConnection()->prepare($sql);
+        $stmt->bindValue(':keyword', "%{$keyword}%", PDO::PARAM_STR);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
+    // Метод для проверки существования новости
+    public function existsByTitle($title) {
+        $sql = "SELECT COUNT(*) as count FROM news WHERE title = :title";
+        $stmt = $this->db->getConnection()->prepare($sql);
+        $stmt->bindValue(':title', $title, PDO::PARAM_STR);
+        $stmt->execute();
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return (int)$result['count'] > 0;
+    }
 
 
     // Увеличить счетчик просмотров - используется при каждом открытии страницы новости
