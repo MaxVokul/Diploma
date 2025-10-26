@@ -251,40 +251,6 @@ if ($_POST && !isset($_POST['import_news'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/assets/css/main.css">
     <link href="https://fonts.googleapis.com/css2?family=Aclonica&display=swap" rel="stylesheet">
-    <style>
-        .import-section {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            padding: 20px;
-            margin-bottom: 30px;
-        }
-        .import-form {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr auto;
-            gap: 10px;
-            align-items: end;
-        }
-        .import-form .form-group {
-            margin-bottom: 0;
-        }
-        .api-options {
-            margin-top: 15px;
-        }
-        .btn-import {
-            background-color: #28a745;
-            border-color: #28a745;
-        }
-        .btn-import:hover {
-            background-color: #218838;
-            border-color: #1e7e34;
-        }
-        @media (max-width: 768px) {
-            .import-form {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
 </head>
 <body>
 <?php include '../../header.php'; ?>
@@ -297,8 +263,8 @@ if ($_POST && !isset($_POST['import_news'])) {
                 <li><a href="/admin/">Dashboard</a></li>
                 <li><a href="/admin/news/manage.php">Manage News</a></li>
                 <li><a href="/admin/news/create.php">Create News</a></li>
-                <li><a href="/admin/backup.php">Backup</a></li> <!-- Добавьте эту строку -->
-                <li><a href="/logout.php">Logout</a></li>
+                <li><a href="/admin/backup.php">Backup</a></li>
+                <li><a href="/app/controller/logout.php">Logout</a></li>
             </ul>
         </nav>
     </aside>
@@ -316,7 +282,7 @@ if ($_POST && !isset($_POST['import_news'])) {
         <!-- API News Import Section -->
         <div class="import-section">
             <h2>📰 Import News from GNews API</h2>
-            <p>Automatically create news from current world news in English.</p>
+            <p>Automatically create news from current world news.</p>
 
             <form method="POST" class="import-form">
                 <div class="form-group">

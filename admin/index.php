@@ -47,8 +47,8 @@ $totalCategories = count($categories);
                 <li><a href="/admin/">Dashboard</a></li>
                 <li><a href="/admin/news/manage.php">Manage News</a></li>
                 <li><a href="/admin/news/create.php">Create News</a></li>
-                <li><a href="/admin/backup.php">Backup</a></li> <!-- Добавьте эту строку -->
-                <li><a href="/logout.php">Logout</a></li>
+                <li><a href="/admin/backup.php">Backup</a></li>
+                <li><a href="/app/controller/logout.php">Logout</a></li>
             </ul>
         </nav>
     </aside>

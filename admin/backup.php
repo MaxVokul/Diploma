@@ -183,49 +183,6 @@ $backups = getBackups();
     <title>Backup - NEWS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/assets/css/main.css">
-    <style>
-        .message {
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-        }
-        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .btn {
-            padding: 8px 12px;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 14px;
-            margin: 2px;
-        }
-        .btn-primary { background: #007bff; }
-        .btn-primary:hover { background: #0056b3; }
-        .btn-download { background: #17a2b8; }
-        .btn-download:hover { background: #138496; }
-        .btn-delete { background: #dc3545; }
-        .btn-delete:hover { background: #c82333; }
-        .backup-item {
-            background: white;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .backup-info {
-            flex: 1;
-        }
-        .backup-actions {
-            display: flex;
-            gap: 5px;
-        }
-    </style>
 </head>
 <body>
 <?php include '../header.php'; ?>
@@ -239,7 +196,7 @@ $backups = getBackups();
                 <li><a href="/admin/news/manage.php">Manage News</a></li>
                 <li><a href="/admin/news/create.php">Create News</a></li>
                 <li><a href="/admin/backup.php">Backup</a></li>
-                <li><a href="/logout.php">Logout</a></li>
+                <li><a href="/app/controller/logout.php">Logout</a></li>
             </ul>
         </nav>
     </aside>

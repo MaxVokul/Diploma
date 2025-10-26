@@ -1818,6 +1818,77 @@ tr:nth-child(even) { background-color: #f9f9f9; }
     color: white;
     text-decoration: none;
 }
+.message {
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+}
+.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+.btn {
+    padding: 8px 12px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 2px;
+}
+.btn-primary { background: #007bff; }
+.btn-primary:hover { background: #0056b3; }
+.btn-download { background: #17a2b8; }
+.btn-download:hover { background: #138496; }
+.btn-delete { background: #dc3545; }
+.btn-delete:hover { background: #c82333; }
+.backup-item {
+    background: white;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.backup-info {
+    flex: 1;
+}
+.backup-actions {
+    display: flex;
+    gap: 5px;
+}
+
+/*create.php*/
+.import-section {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 20px;
+    margin-bottom: 30px;
+}
+.import-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 10px;
+    align-items: end;
+}
+.import-form .form-group {
+    margin-bottom: 0;
+}
+.api-options {
+    margin-top: 15px;
+}
+.btn-import {
+    background-color: var(--primary);
+    border-color: var(--primary);;
+}
+@media (max-width: 768px) {
+    .import-form {
+        grid-template-columns: 1fr;
+    }
+}
 
 /* Mobile search styles */
 @media (max-width: 768px) {
