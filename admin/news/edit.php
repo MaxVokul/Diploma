@@ -21,7 +21,7 @@ if (!$userModel->isAdmin($_SESSION['user_id'])) {
 $id = (int)($_GET['id'] ?? 0);
 if ($id <= 0) {
     http_response_code(404);
-    die('Новость не найдена');
+    die('No news article found');
 }
 
 $newsModel = new NewsModel();
@@ -47,7 +47,7 @@ if ($_POST) {
     $isPublished = isset($_POST['is_published']) ? 1 : 0;
 
     if (empty($title) || empty($content) || $categoryId <= 0) {
-        $error = 'Пожалуйста, заполните все обязательные поля.';
+        $error = 'Please, fill in all the required fields.';
     } else {
         $data = [
             'title' => $title,
@@ -60,11 +60,11 @@ if ($_POST) {
         ];
 
         if ($newsModel->update($id, $data)) {
-            $success = 'Новость успешно обновлена!';
+            $success = 'The news item has been updated!';
             // Обновляем данные новости для отображения
             $newsItem = array_merge($newsItem, $data);
         } else {
-            $error = 'Ошибка при обновлении новости. Попробуйте еще раз.';
+            $error = 'Error updating the news item!';
         }
     }
 }
@@ -74,7 +74,7 @@ if ($_POST) {
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Редактировать новость - NEWS</title>
+    <title>Edit news item - NEWS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/assets/css/main.css">
     <link href="https://fonts.googleapis.com/css2?family=Aclonica&display=swap" rel="stylesheet">
@@ -85,19 +85,20 @@ if ($_POST) {
 
 <div class="admin-container">
     <aside class="admin-sidebar">
-        <h2>Админ-панель</h2>
+        <h2>Admin Panel</h2>
         <nav>
             <ul>
-                <li><a href="/admin/">Главная</a></li>
-                <li><a href="/admin/news/manage.php">Управление новостями</a></li>
-                <li><a href="/admin/news/create.php">Создать новость</a></li>
-                <li><a href="/app/controller/logout.php">Выйти</a></li>
+                <li><a href="/admin/">Dashboard</a></li>
+                <li><a href="/admin/news/manage.php">Manage News</a></li>
+                <li><a href="/admin/news/create.php">Create News</a></li>
+                <li><a href="/admin/backup.php">Backup</a></li> <!-- Добавьте эту строку -->
+                <li><a href="/logout.php">Logout</a></li>
             </ul>
         </nav>
     </aside>
 
     <main class="admin-main">
-        <h1>Редактировать новость</h1>
+        <h1>Edit news</h1>
 
         <?php if ($error): ?>
             <div class="message error"><?php echo htmlspecialchars($error); ?></div>
@@ -147,7 +148,7 @@ if ($_POST) {
             <div class="form-group">
                 <label>
                     <input type="checkbox" name="is_published" value="1" <?php echo ($newsItem['is_published'] ? 'checked' : ''); ?>>
-                    Опубликовано
+                    Published
                 </label>
             </div>
 

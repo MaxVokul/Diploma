@@ -5,7 +5,7 @@ require_once '../../app/core/Database.php';
 require_once '../../app/models/UserModel.php';
 require_once '../../app/models/NewsModel.php';
 
-// Проверка авторизации и прав администратора
+// Check authorization and admin rights
 if (!isset($_SESSION['user_id'])) {
     $_SESSION['redirect_to'] = $_SERVER['REQUEST_URI'];
     header('Location: /index.php');
@@ -24,14 +24,104 @@ $categories = $newsModel->getAllCategories();
 $error = '';
 $success = '';
 
-// Обработка импорта новостей из API
+// Helper functions
+function getCategoryIdFromApiCategory($apiCategory, $categories) {
+    $categoryMapping = [
+        'general' => 'General',
+        'world' => 'World',
+        'nation' => 'Politics',
+        'business' => 'Business',
+        'technology' => 'Technology',
+        'entertainment' => 'Entertainment',
+        'sports' => 'Sports',
+        'science' => 'Science',
+        'health' => 'Health'
+    ];
+
+    // Find category name by API key
+    $targetCategoryName = $categoryMapping[$apiCategory] ?? 'World';
+
+    // Find matching category in our database
+    foreach ($categories as $category) {
+        if (strtolower($category['name']) === strtolower($targetCategoryName)) {
+            return $category['id'];
+        }
+    }
+
+    // If not found, return World as default
+    return 2; // ID for World
+}
+
+function getCategoryNameById($categoryId, $categories) {
+    foreach ($categories as $category) {
+        if ($category['id'] == $categoryId) {
+            return $category['name'];
+        }
+    }
+    return 'World';
+}
+
+function cleanContent($content) {
+    if (empty($content)) return '';
+
+    // Remove [number chars] at the end
+    $content = preg_replace('/\s*\[\d+\s*chars?\s*\]\s*\.?$/i', '', $content);
+    $content = preg_replace('/\s*\[\d+\s*\]\s*\.?$/i', '', $content);
+
+    // Remove extra spaces
+    $content = trim($content);
+
+    // Replace multiple spaces with single ones
+    $content = preg_replace('/\s+/', ' ', $content);
+
+    return $content;
+}
+
+function containsEllipsis($text) {
+    return strpos($text, '...') !== false ||
+        preg_match('/\s*\.{3,}\s*$/', $text) ||
+        preg_match('/\s*…\s*$/', $text);
+}
+
+function getFullArticleContent($article) {
+    // Try different content sources in order of priority
+
+    // 1. Full content from API (if available with expand=content)
+    if (!empty($article['content']) && !containsEllipsis($article['content'])) {
+        return cleanContent($article['content']);
+    }
+
+    // 2. Description (usually more complete than truncated content)
+    if (!empty($article['description'])) {
+        $description = cleanContent($article['description']);
+        if (!containsEllipsis($description) && strlen($description) > 200) {
+            return $description;
+        }
+    }
+
+    // 3. Content even with ellipsis, but cleaned
+    if (!empty($article['content'])) {
+        $content = cleanContent($article['content']);
+        // If content is truncated, add a note
+        if (containsEllipsis($content)) {
+            $content .= "\n\n[Article continues on the original website]";
+        }
+        return $content;
+    }
+
+    // 4. Title as last resort
+    return cleanContent($article['title']);
+}
+
+// Process news import from API
 if (isset($_POST['import_news'])) {
     $apiKey = 'b1df8d8cce581126dbd404a0d5cffc13';
     $category = $_POST['api_category'] ?? 'general';
     $country = $_POST['api_country'] ?? 'us';
     $max = min(10, (int)($_POST['api_max'] ?? 10));
 
-    $url = "https://gnews.io/api/v4/top-headlines?category=$category&lang=en&country=$country&max=$max&apikey=$apiKey";
+    // Use search endpoint for better content
+    $url = "https://gnews.io/api/v4/search?q=$category&lang=en&country=$country&max=$max&apikey=$apiKey";
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
@@ -48,33 +138,34 @@ if (isset($_POST['import_news'])) {
             $importedCount = 0;
             $errors = [];
 
-            // Получаем ID категории на основе выбора пользователя
+            // Get category ID based on user selection
             $selectedCategoryId = getCategoryIdFromApiCategory($category, $categories);
 
             foreach ($data['articles'] as $article) {
-                // Пропускаем статьи без заголовка
+                // Skip articles without title
                 if (empty($article['title'])) {
                     continue;
                 }
 
-                // Проверяем, существует ли уже такая новость по заголовку
+                // Check if such news already exists by title
                 if (!$newsModel->existsByTitle($article['title'])) {
-                    // Подготавливаем данные
-                    $content = !empty($article['content']) ? $article['content'] :
-                        (!empty($article['description']) ? $article['description'] : $article['title']);
+                    // Get full content
+                    $content = getFullArticleContent($article);
 
-                    $excerpt = !empty($article['description']) ? $article['description'] :
-                        substr($content, 0, 200) . '...';
+                    // Prepare excerpt
+                    $excerpt = !empty($article['description']) ?
+                        cleanContent($article['description']) :
+                        substr(cleanContent($content), 0, 200) . '...';
 
                     $publishedAt = !empty($article['publishedAt']) ?
                         date('Y-m-d H:i:s', strtotime($article['publishedAt'])) :
                         date('Y-m-d H:i:s');
 
                     $data = [
-                        'title' => $article['title'],
+                        'title' => cleanContent($article['title']),
                         'content' => $content,
                         'excerpt' => $excerpt,
-                        'category_id' => $selectedCategoryId, // Используем выбранную категорию
+                        'category_id' => $selectedCategoryId,
                         'author_id' => $_SESSION['user_id'],
                         'published_at' => $publishedAt,
                         'is_published' => 1,
@@ -84,81 +175,79 @@ if (isset($_POST['import_news'])) {
                     if ($newsModel->create($data)) {
                         $importedCount++;
                     } else {
-                        $errors[] = "Не удалось создать новость: " . $article['title'];
+                        $errors[] = "Failed to create news: " . $article['title'];
                     }
                 }
             }
 
             if ($importedCount > 0) {
                 $categoryName = getCategoryNameById($selectedCategoryId, $categories);
-                $success = "Успешно импортировано $importedCount новостей в категорию '$categoryName' из GNews API!";
+                $success = "Successfully imported $importedCount news articles into '$categoryName' category from GNews API!";
                 if (!empty($errors)) {
-                    $success .= " Ошибки: " . count($errors);
+                    $success .= " Errors: " . count($errors);
                 }
             } else {
-                $error = 'Нет новых новостей для импорта или все новости уже существуют.';
+                $error = 'No new news to import or all news already exist.';
                 if (!empty($errors)) {
-                    $error .= " Ошибки при создании: " . implode(', ', $errors);
+                    $error .= " Creation errors: " . implode(', ', $errors);
                 }
             }
         } else {
-            $error = 'Не удалось получить новости из API или новости не найдены.';
+            $error = 'Failed to get news from API or no news found.';
         }
     } else {
-        $error = 'Ошибка при обращении к GNews API. Код ответа: ' . $httpCode;
+        $error = 'Error accessing GNews API. Response code: ' . $httpCode;
         if (!empty($response)) {
             $errorData = json_decode($response, true);
             if (isset($errorData['message'])) {
-                $error .= ' Сообщение: ' . $errorData['message'];
+                $error .= ' Message: ' . $errorData['message'];
             }
         }
     }
 }
 
-// Функция для получения ID категории на основе выбора в API
-function getCategoryIdFromApiCategory($apiCategory, $categories) {
-    $categoryMapping = [
-        'general' => 'General',
-        'world' => 'World',
-        'nation' => 'Politics',
-        'business' => 'Business',
-        'technology' => 'Technology',
-        'entertainment' => 'Entertainment',
-        'sports' => 'Sports',
-        'science' => 'Science',
-        'health' => 'Health'
-    ];
+// Process regular news creation
+if ($_POST && !isset($_POST['import_news'])) {
+    $title = trim($_POST['title'] ?? '');
+    $content = trim($_POST['content'] ?? '');
+    $excerpt = trim($_POST['excerpt'] ?? '');
+    $categoryId = (int)($_POST['category_id'] ?? 0);
+    $imageUrl = trim($_POST['image_url'] ?? '');
+    $publishedAt = $_POST['published_at'] ?? date('Y-m-d H:i:s');
+    $isPublished = isset($_POST['is_published']) ? 1 : 0;
 
-    // Находим название категории по ключу API
-    $targetCategoryName = $categoryMapping[$apiCategory] ?? 'World';
+    if (empty($title) || empty($content) || $categoryId <= 0) {
+        $error = 'Please fill in all required fields.';
+    } else {
+        $data = [
+            'title' => $title,
+            'content' => $content,
+            'excerpt' => $excerpt,
+            'category_id' => $categoryId,
+            'author_id' => $_SESSION['user_id'],
+            'published_at' => $publishedAt,
+            'is_published' => $isPublished,
+            'image_url' => $imageUrl ?: null
+        ];
 
-    // Ищем соответствующую категорию в нашей базе
-    foreach ($categories as $category) {
-        if (strtolower($category['name']) === strtolower($targetCategoryName)) {
-            return $category['id'];
+        if ($newsModel->create($data)) {
+            $success = 'News successfully created!';
+            // Clear form fields after successful creation
+            $_POST = [];
+            // Redirect to management page
+            header("Location: /admin/news/manage.php");
+            exit();
+        } else {
+            $error = 'Error creating news. Please try again.';
         }
     }
-
-    // Если не нашли, возвращаем World по умолчанию
-    return 2; // ID для World
 }
-
-// Функция для получения названия категории по ID
-function getCategoryNameById($categoryId, $categories) {
-    foreach ($categories as $category) {
-        if ($category['id'] == $categoryId) {
-            return $category['name'];
-        }
-    }
-    return 'World';
-}
-
 ?>
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Создать новость - NEWS</title>
+    <title>Create News - NEWS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/assets/css/main.css">
     <link href="https://fonts.googleapis.com/css2?family=Aclonica&display=swap" rel="stylesheet">
@@ -202,19 +291,20 @@ function getCategoryNameById($categoryId, $categories) {
 
 <div class="admin-container">
     <aside class="admin-sidebar">
-        <h2>Админ-панель</h2>
+        <h2>Admin Panel</h2>
         <nav>
             <ul>
-                <li><a href="/admin/">Главная</a></li>
-                <li><a href="/admin/news/manage.php">Управление новостями</a></li>
-                <li><a href="/admin/news/create.php">Создать новость</a></li>
-                <li><a href="/logout.php">Выйти</a></li>
+                <li><a href="/admin/">Dashboard</a></li>
+                <li><a href="/admin/news/manage.php">Manage News</a></li>
+                <li><a href="/admin/news/create.php">Create News</a></li>
+                <li><a href="/admin/backup.php">Backup</a></li> <!-- Добавьте эту строку -->
+                <li><a href="/logout.php">Logout</a></li>
             </ul>
         </nav>
     </aside>
 
     <main class="admin-main">
-        <h1>Создать новость</h1>
+        <h1>Create News</h1>
 
         <?php if ($error): ?>
             <div class="message error"><?php echo htmlspecialchars($error); ?></div>
@@ -223,14 +313,14 @@ function getCategoryNameById($categoryId, $categories) {
             <div class="message success"><?php echo htmlspecialchars($success); ?></div>
         <?php endif; ?>
 
-        <!-- Секция импорта новостей из API -->
+        <!-- API News Import Section -->
         <div class="import-section">
-            <h2>📰 Импорт новостей из GNews API</h2>
-            <p>Автоматически создайте новости из актуальных мировых новостей на английском языке.</p>
+            <h2>📰 Import News from GNews API</h2>
+            <p>Automatically create news from current world news in English.</p>
 
             <form method="POST" class="import-form">
                 <div class="form-group">
-                    <label for="api_category">Категория</label>
+                    <label for="api_category">Category</label>
                     <select id="api_category" name="api_category" required>
                         <option value="general">General</option>
                         <option value="world">World</option>
@@ -244,7 +334,7 @@ function getCategoryNameById($categoryId, $categories) {
                 </div>
 
                 <div class="form-group">
-                    <label for="api_country">Страна</label>
+                    <label for="api_country">Country</label>
                     <select id="api_country" name="api_country" required>
                         <option value="us">USA</option>
                         <option value="gb">Great Britain</option>
@@ -255,7 +345,7 @@ function getCategoryNameById($categoryId, $categories) {
                 </div>
 
                 <div class="form-group">
-                    <label for="api_max">Количество новостей</label>
+                    <label for="api_max">Number of Articles</label>
                     <select id="api_max" name="api_max" required>
                         <option value="5">5</option>
                         <option value="10" selected>10</option>
@@ -263,34 +353,33 @@ function getCategoryNameById($categoryId, $categories) {
                 </div>
 
                 <div class="form-group">
-                    <button type="submit" name="import_news" class="btn btn-import">Импортировать новости</button>
+                    <button type="submit" name="import_news" class="btn btn-import">Import News</button>
                 </div>
             </form>
 
             <div class="api-options">
-                <small><strong>Доступные категории:</strong> general, world, business, technology, entertainment, sports, science, health</small><br>
-                <small><strong>Поддерживаемые страны:</strong> США, Великобритания, Канада, Австралия, Индия</small><br>
-                <small><strong>Язык:</strong> Все новости импортируются на английском языке</small>
+                <small><strong>Supported countries:</strong> USA, Great Britain, Canada, Australia, India</small><br>
+                <small><strong>Language:</strong> All news are imported in English</small>
             </div>
         </div>
 
-        <!-- Обычная форма создания новости -->
-        <h2>✏️ Создать новость вручную</h2>
+        <!-- Manual News Creation Form -->
+        <h2>✏️ Create News Manually</h2>
         <form method="POST" class="news-form">
             <div class="form-group">
-                <label for="title">Заголовок *</label>
+                <label for="title">Title *</label>
                 <input type="text" id="title" name="title" value="<?php echo htmlspecialchars($_POST['title'] ?? ''); ?>" required>
             </div>
 
             <div class="form-group">
-                <label for="excerpt">Краткое описание</label>
+                <label for="excerpt">Short Description</label>
                 <textarea id="excerpt" name="excerpt"><?php echo htmlspecialchars($_POST['excerpt'] ?? ''); ?></textarea>
             </div>
 
             <div class="form-group">
-                <label for="category_id">Категория *</label>
+                <label for="category_id">Category *</label>
                 <select id="category_id" name="category_id" required>
-                    <option value="">Выберите категорию</option>
+                    <option value="">Select Category</option>
                     <?php foreach($categories as $cat): ?>
                         <option value="<?php echo $cat['id']; ?>" <?php echo (($_POST['category_id'] ?? '') == $cat['id'] ? 'selected' : ''); ?>>
                             <?php echo htmlspecialchars($cat['name']); ?>
@@ -300,28 +389,28 @@ function getCategoryNameById($categoryId, $categories) {
             </div>
 
             <div class="form-group">
-                <label for="content">Текст новости *</label>
+                <label for="content">News Content *</label>
                 <textarea id="content" name="content" required><?php echo htmlspecialchars($_POST['content'] ?? ''); ?></textarea>
             </div>
 
             <div class="form-group">
-                <label for="image_input">URL изображения или путь к файлу</label>
-                <input type="text" id="image_input" name="image_input" value="<?php echo htmlspecialchars($_POST['image_url'] ?? $_POST['image_input'] ?? ''); ?>" placeholder="Введите URL или путь к файлу">
+                <label for="image_input">Image URL or File Path</label>
+                <input type="text" id="image_input" name="image_input" value="<?php echo htmlspecialchars($_POST['image_url'] ?? $_POST['image_input'] ?? ''); ?>" placeholder="Enter URL or file path">
             </div>
 
             <div class="form-group">
-                <label for="published_at">Дата публикации</label>
+                <label for="published_at">Publication Date</label>
                 <input type="datetime-local" id="published_at" name="published_at" value="<?php echo htmlspecialchars($_POST['published_at'] ?? date('Y-m-d\TH:i')); ?>">
             </div>
 
             <div class="form-group">
                 <label>
                     <input type="checkbox" name="is_published" value="1" <?php echo (isset($_POST['is_published']) && $_POST['is_published']) ? 'checked' : ''; ?>>
-                    Опубликовано
+                    Published
                 </label>
             </div>
 
-            <button type="submit" class="btn-submit">Создать новость</button>
+            <button type="submit" class="btn-submit">Create News</button>
         </form>
     </main>
 </div>
