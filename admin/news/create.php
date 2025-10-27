@@ -138,7 +138,7 @@ if (isset($_POST['import_news'])) {
             $importedCount = 0;
             $errors = [];
 
-            // Get category ID based on user selection
+            // Получить ID категории основываясь на выборе пользователя
             $selectedCategoryId = getCategoryIdFromApiCategory($category, $categories);
 
             foreach ($data['articles'] as $article) {
@@ -147,7 +147,7 @@ if (isset($_POST['import_news'])) {
                     continue;
                 }
 
-                // Check if such news already exists by title
+                // Проверка на уникальность новости по названию
                 if (!$newsModel->existsByTitle($article['title'])) {
                     // Get full content
                     $content = getFullArticleContent($article);

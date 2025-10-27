@@ -23,7 +23,7 @@ class NewsModel {
         //1    | Новость1| Politics   | politics  | maks
         //2    | Новость2| Technology | technology| keny
 
-        //Присвоение плейсхолдеров, защита от SQL инъекций:
+        //Присвоение плейсхолдеров, защита от SQL инъекций -  данные SQL-команды всегда будут обрабатываться как текстовые значения, а не как исполняемый код:
         $stmt = $this->db->getConnection()->prepare($sql);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);

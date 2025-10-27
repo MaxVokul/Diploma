@@ -20,7 +20,7 @@ function createBackup() {
     try {
         $backupDir = __DIR__ . '/../backups/';
 
-        // Create backups directory if not exists
+        // Создание папки если нет
         if (!is_dir($backupDir)) {
             mkdir($backupDir, 0755, true);
         }
