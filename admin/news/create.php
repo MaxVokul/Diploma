@@ -5,7 +5,7 @@ require_once '../../app/core/Database.php';
 require_once '../../app/models/UserModel.php';
 require_once '../../app/models/NewsModel.php';
 
-// Check authorization and admin rights
+// Проверка является ли пользователь админом
 if (!isset($_SESSION['user_id'])) {
     $_SESSION['redirect_to'] = $_SERVER['REQUEST_URI'];
     header('Location: /index.php');
@@ -84,14 +84,14 @@ function containsEllipsis($text) {
 }
 
 function getFullArticleContent($article) {
-    // Try different content sources in order of priority
+    // Исп разные источники контента
 
-    // 1. Full content from API (if available with expand=content)
+    // 1. Весь контент из API
     if (!empty($article['content']) && !containsEllipsis($article['content'])) {
         return cleanContent($article['content']);
     }
 
-    // 2. Description (usually more complete than truncated content)
+    // 2. Описание
     if (!empty($article['description'])) {
         $description = cleanContent($article['description']);
         if (!containsEllipsis($description) && strlen($description) > 200) {
@@ -99,7 +99,7 @@ function getFullArticleContent($article) {
         }
     }
 
-    // 3. Content even with ellipsis, but cleaned
+    // 3. Есть многоточие, но форма чище
     if (!empty($article['content'])) {
         $content = cleanContent($article['content']);
         // If content is truncated, add a note
@@ -109,18 +109,18 @@ function getFullArticleContent($article) {
         return $content;
     }
 
-    // 4. Title as last resort
+    // 4. Вставить Тайтл, если остального нет
     return cleanContent($article['title']);
 }
 
-// Process news import from API
+// Импорт из API
 if (isset($_POST['import_news'])) {
     $apiKey = 'b1df8d8cce581126dbd404a0d5cffc13';
     $category = $_POST['api_category'] ?? 'general';
     $country = $_POST['api_country'] ?? 'us';
     $max = min(10, (int)($_POST['api_max'] ?? 10));
 
-    // Use search endpoint for better content
+    // Запуск урл запроса (форма)
     $url = "https://gnews.io/api/v4/search?q=$category&lang=en&country=$country&max=$max&apikey=$apiKey";
 
     $ch = curl_init();
@@ -232,9 +232,9 @@ if ($_POST && !isset($_POST['import_news'])) {
 
         if ($newsModel->create($data)) {
             $success = 'News successfully created!';
-            // Clear form fields after successful creation
+            // Очистка полей после создания
             $_POST = [];
-            // Redirect to management page
+            // перенаправить на страницу manage
             header("Location: /admin/news/manage.php");
             exit();
         } else {
@@ -243,17 +243,10 @@ if ($_POST && !isset($_POST['import_news'])) {
     }
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Create News - NEWS</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/assets/css/main.css">
-    <link href="https://fonts.googleapis.com/css2?family=Aclonica&display=swap" rel="stylesheet">
-</head>
-<body>
-<?php include '../../header.php'; ?>
+<?php
+$pageTitle = "Создать новость - NEWS";
+require_once __DIR__ . '/../../header.php';
+?>
 
 <div class="admin-container">
     <aside class="admin-sidebar">

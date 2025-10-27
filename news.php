@@ -40,7 +40,13 @@ include __DIR__ . '/header.php';
         <img class="imgts" src="<?php echo htmlspecialchars($newsItem['image_url'] ?? '/resources/image 1.png'); ?>" alt="<?php echo htmlspecialchars($newsItem['title']); ?>">
     </div>
     <article class="news-content">
-        <?php echo $newsItem['content']; ?>
+        <?php
+        // Разрешаем только безопасные теги для форматирования
+        $safe_content = strip_tags($newsItem['content'],
+            '<p><br><strong><b><em><i><u><ul><ol><li><h1><h2><h3><h4><h5><h6><blockquote><div><span>'
+        );
+        echo $safe_content;
+        ?>
     </article>
     <p>Category: <a href="/category.php?category=<?php echo htmlspecialchars($newsItem['category_slug'] ?? ''); ?>"><?php echo htmlspecialchars($newsItem['category_name'] ?? ''); ?></a></p>
 </section>

@@ -25,19 +25,10 @@ $categories = $newsModel->getAllCategories();
 $totalCategories = count($categories);
 
 ?>
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin-panel - NEWS</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" media="(min-width: 570px)" href="/assets/css/main.css">
-    <link rel="stylesheet" media="(max-width: 570px)" href="/assets/css/mobile.css">
-    <link href="https://fonts.googleapis.com/css2?family=Aclonica&display=swap" rel="stylesheet">
-
-</head>
-<body>
-<?php include '../header.php'; ?>
+<?php
+$pageTitle = "Админ-панель - NEWS";
+require_once __DIR__ . '/../header.php';
+?>
 
 <div class="admin-container">
     <aside class="admin-sidebar">

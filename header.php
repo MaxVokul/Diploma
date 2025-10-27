@@ -48,6 +48,11 @@ try {
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Aclonica&display=swap" rel="stylesheet">
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/icons8-news.svg">
+    <link rel="alternate icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+
     <title>NEWS</title>
 </head>
 <body>
